@@ -13,4 +13,5 @@ This extension can be installed through PIP.
 This extension can be enabled in Jupyter Notebook by running the following on the command line:
 
 > jupyter nbextension install --py jupyter_wysiwyg
+
 > jupyter nbextension enable --py jupyter_wysiwyg
