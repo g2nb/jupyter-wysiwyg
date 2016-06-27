@@ -10,7 +10,7 @@ installing this nbextension will have to be performed manually.
 
 This extension can be installed through PIP.
 
-> pip install jupyter_wysiwyg
+> pip install jupyter-wysiwyg
 
 ## Enabling
 
