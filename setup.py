@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-setup(name='jupyter_wysiwyg',
+setup(name='jupyter-wysiwyg',
       packages=['jupyter_wysiwyg'],
       version='0.1.0',
       description='WYSIWYG editing functionality for markdown/HTML cells in Jupyter',
