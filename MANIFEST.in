@@ -1,0 +1,2 @@
+include jupyter_wysiwyg/static/*
+include jupyter_wysiwyg/static/resources/*
