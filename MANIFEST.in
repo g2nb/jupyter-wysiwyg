@@ -1,2 +1,8 @@
 include jupyter_wysiwyg/static/*
-include jupyter_wysiwyg/static/resources/*
+include jupyter_wysiwyg/static/ckeditor/*
+recursive-include jupyter_wysiwyg/static *.js
+recursive-include jupyter_wysiwyg/static *.css
+recursive-include jupyter_wysiwyg/static *.png
+recursive-include jupyter_wysiwyg/static *.gif
+recursive-include jupyter_wysiwyg/static *.html
+recursive-include jupyter_wysiwyg/static *.md
