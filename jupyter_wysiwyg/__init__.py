@@ -1,8 +1,8 @@
 __author__ = 'Thorin Tabor'
 __copyright__ = 'Copyright 2016, Broad Institute'
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 __status__ = 'Beta'
-__license__ = 'BSD-style'
+__license__ = 'BSD'
 
 def _jupyter_server_extension_paths():
     return [{
