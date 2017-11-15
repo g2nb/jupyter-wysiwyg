@@ -15,3 +15,7 @@ This extension can be enabled in Jupyter Notebook by running the following on th
 > jupyter nbextension install --py jupyter_wysiwyg
 
 > jupyter nbextension enable --py jupyter_wysiwyg
+
+## Using the Editor
+
+To use the WYSIWYG editor, first create a markdown cell, then select the cell. You should now see two buttons appear on the left side of the cell. These buttons will have the "Rich Text Editing" and "Run Cell" tooltips. Click the "Rich Text Editing" button to launch the editor.
