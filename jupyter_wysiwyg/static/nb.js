@@ -135,7 +135,7 @@ define([
      * @param cell - Jupyter cell object for WYSIWYG mode
      */
     function show_wysiwyg_button(cell) {
-        cell.element.find(".wysiwyg-toggle").show();
+        cell.element.find(".wyxsiwyg-toggle").show();
         cell.element.find(".wysiwyg-done").show();
     }
 
