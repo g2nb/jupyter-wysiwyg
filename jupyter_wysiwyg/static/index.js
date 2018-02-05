@@ -29,6 +29,8 @@ define([
         // Initialize CKEditor
         var editor = CKEDITOR.replace(textbox[0], {
             height: 250,
+            allowedContent: true,
+            contentsCss: [CKEDITOR.basePath + 'contents.css', location.origin + Jupyter.contents.base_url + '/static/style/style.min.css'],
             extraPlugins: 'divarea',
             removePlugins: "magicline",
             toolbarGroups: [
