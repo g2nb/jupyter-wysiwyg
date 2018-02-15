@@ -1,6 +1,6 @@
 __author__ = 'Thorin Tabor'
 __copyright__ = 'Copyright 2016-2017, Regents of the University of California & Broad Institute'
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 __status__ = 'Beta'
 __license__ = 'BSD'
 
