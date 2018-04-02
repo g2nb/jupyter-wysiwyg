@@ -4,13 +4,17 @@ This is an nbextension that enables WYSIWYG editing functionality for HTML/Markd
 
 ## Installing
 
-This extension can be installed through PIP.
+This extension can be installed through either PIP or conda.
 
 > pip install jupyter-wysiwyg
 
+> conda install -c genepattern jupyter-wysiwyg
+
 ## Enabling
 
-This extension can be enabled in Jupyter Notebook by running the following on the command line:
+To enable this extension in Jupyter Notebook 5.2 and earlier you will need to run the following command lines. 
+
+In Jupyter Notebook 5.3 and later, this is automatic and will not be necessary.
 
 > jupyter nbextension install --py jupyter_wysiwyg
 
