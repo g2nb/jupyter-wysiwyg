@@ -1,4 +1,14 @@
 from distutils.core import setup
+import os
+
+
+def get_data_files(directory):
+    paths = []
+    for (path, directories, filenames) in os.walk(directory):
+        for filename in filenames:
+            paths.append((path.replace('jupyter_wysiwyg/static', 'share/jupyter/nbextensions/jupyter_wysiwyg'), os.path.join(path, filename),))
+    return paths
+
 
 setup(name='jupyter-wysiwyg',
       packages=['jupyter_wysiwyg'],
@@ -29,4 +39,5 @@ setup(name='jupyter-wysiwyg',
                                         'static/*/*/*/*',
                                         'static/*/*/*/*/*',
                                         'static/*/*/*/*/*/*']},
+      data_files=get_data_files('jupyter_wysiwyg/static'),
       )
