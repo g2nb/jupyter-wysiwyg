@@ -237,6 +237,10 @@ define([
                 if (!target.cell.rendered) show_wysiwyg_button(target.cell);
             }, 100);
         });
+        $(".text_cell_render").dblclick(function(event) {
+            const target = $(event.target).closest(".cell").data("cell");
+            setTimeout(function() { show_wysiwyg_button(target); }, 100);
+        });
         $([Jupyter.events]).on('edit_mode.Cell', function(event, target) {
             show_wysiwyg_button(target.cell);
         });
