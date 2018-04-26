@@ -16,13 +16,13 @@ def get_data_files():
 
 setup(name='jupyter-wysiwyg',
       packages=['jupyter_wysiwyg'],
-      version='0.1.6',
+      version='0.1.7',
       description='WYSIWYG editing functionality for markdown/HTML cells in Jupyter',
       license='BSD',
       author='Thorin Tabor',
       author_email='thorin@broadinstitute.org',
       url='https://github.com/genepattern/jupyter-wysiwyg/tree/master/wysiwyg',
-      download_url='https://github.com/genepattern/jupyter-wysiwyg/archive/0.1.6.tar.gz',
+      download_url='https://github.com/genepattern/jupyter-wysiwyg/archive/0.1.7.tar.gz',
       keywords=['genepattern', 'wysiwyg', 'ipython', 'jupyter'],
       classifiers=[
           'Development Status :: 4 - Beta',
