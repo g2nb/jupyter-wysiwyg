@@ -3,12 +3,10 @@
 1. Make sure setup.py and __init__.py are updated.
 2. Navigate to the correct directory:
 > cd jupyter-wysiwyg
-3. Run the following to register the deploy with the test PyPi:
-> python setup.py register -r pypitest
-4. Upload the files by running:
+3. Upload the files by running:
 > python setup.py sdist upload -r pypitest
-5. If the upload fails go to [https://testpypi.python.org/pypi](https://testpypi.python.org/pypi) and manually upload dist/jupyter-wysiwyg-*.tar.gz.
-6. Test the deploy by uninstalling and reinstalling the package: 
+4. If the upload fails go to [https://testpypi.python.org/pypi](https://testpypi.python.org/pypi) and manually upload dist/jupyter-wysiwyg-*.tar.gz.
+5. Test the deploy by uninstalling and reinstalling the package:
 > sudo pip uninstall jupyter-wysiwyg;
 > sudo pip install -i https://testpypi.python.org/pypi jupyter-wysiwyg
 
