@@ -18,7 +18,7 @@ def get_data_files():
 
 setup(name='jupyter-wysiwyg',
       packages=['jupyter_wysiwyg'],
-      version='0.1.9',
+      version='19.05',
       description='WYSIWYG editing functionality for markdown/HTML cells in Jupyter',
       license='BSD',
       author='Thorin Tabor',
