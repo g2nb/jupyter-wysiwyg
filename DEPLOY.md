@@ -29,13 +29,15 @@
 1. Deploy to Production PyPi
 2. Navigate to Anaconda directory
 > cd anaconda
-3. Run the following, removing the existing directory if necessary:
+3. Activate a clean environment.
+> conda activate clean
+4. Run the following, removing the existing directory if necessary:
 > conda skeleton pypi jupyter-wysiwyg --version XXX
-4. Build the package:
+5. Build the package:
 > conda build jupyter-wysiwyg
-5. Upload the newly built package:
+6. Upload the newly built package:
 > anaconda upload /Users/tabor/anaconda/conda-bld/osx-64/jupyter-wysiwyg-XXX-py36_0.tar.bz2 -u genepattern
-6. Converting this package to builds for other operating systems can be done as shown below. You will need to upload each 
+7. Converting this package to builds for other operating systems can be done as shown below. You will need to upload each
 built version using a separate upload command.
 > conda convert --platform all /Users/tabor/anaconda/conda-bld/osx-64/jupyter-wysiwyg-XXX-py36_0.tar.bz2 -o conda-bld/
-7. Log into the [Anaconda website](https://anaconda.org/) to make sure everything is good.
+8. Log into the [Anaconda website](https://anaconda.org/) to make sure everything is good.
