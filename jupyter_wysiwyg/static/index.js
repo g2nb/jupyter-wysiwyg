@@ -1,11 +1,10 @@
 // Add file path shim for Jupyter 3/4
-var WYSIWYG_PATH = location.origin + Jupyter.contents.base_url + "nbextensions/jupyter_wysiwyg/";
+const WYSIWYG_PATH = location.origin + Jupyter.contents.base_url + "nbextensions/jupyter_wysiwyg/";
 
 define([
     "base/js/namespace",
     "jquery",
-    WYSIWYG_PATH + "ckeditor/ckeditor.js",
-    WYSIWYG_PATH + "ckeditor/adapters/jquery.js"], function(Jupyter) {
+    WYSIWYG_PATH + "ckeditor/ckeditor.js"], function(Jupyter, $, CKEDITOR) {
 
     /**
      * Take a Markdown cell and initialize WYSIWYG mode for the cell
@@ -18,7 +17,7 @@ define([
         if (!cell.rendered) cell.render();
 
         // Get the DOM elements
-        var textbox = cell.element.find(".text_cell_render");
+        const textbox = cell.element.find(".text_cell_render");
 
         // Special case to remove anchor links before editing
         textbox.find(".anchor-link").remove();
@@ -26,48 +25,43 @@ define([
         // Special case for placeholder text in empty cells
         if (cell.get_text().length === 0) textbox.empty();
 
+        // function Markdown( editor ) {
+        //     editor.data.processor = new CKEDITOR.GFMDataProcessor();
+        // }
+
         // Initialize CKEditor
-        var editor = CKEDITOR.replace(textbox[0], {
-            height: 250,
-            allowedContent: true,
-            contentsCss: [CKEDITOR.basePath + 'contents.css', location.origin + Jupyter.contents.base_url + '/static/style/style.min.css'],
-            extraPlugins: 'divarea',
-            removePlugins: "magicline",
-            toolbarGroups: [
-                { name: 'styles', groups: [ 'styles' ] },
-                { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
-                { name: 'links', groups: [ 'links' ] },
-                { name: 'insert', groups: [ 'insert' ] }
-            ]
-        });
+        CKEDITOR.create(textbox[0], {
+                //extraPlugins: [Markdown]
+            })
+            .then( editor => {
+                // Attach editor to cell
+                cell.element.data("editor", editor);
 
-        // Editor settings
-        editor.on('instanceReady', function( ev ) {
-            editor.setReadOnly(false);
-        });
+                // Editor settings
+                // editor.on('instanceReady', function( ev ) {
+                //     editor.setReadOnly(false);
+                // });
 
-        // Attach editor to cell
-        cell.element.data("editor", editor);
+                // Editor keyboard events
+                editor.editing.view.document.on('change:isFocused', (evt, name, value) => {
+                    if (value) Jupyter.notebook.keyboard_manager.disable();
+                    else Jupyter.notebook.keyboard_manager.enable();
+                });
+                cell.element.find(".inner_cell").dblclick(function(event) {
+                    is_wysiwyg_mode(cell) ? event.stopPropagation() : {};
+                });
 
-        // Editor keyboard events
-        editor.on('focus', function( ev ) {
-            Jupyter.notebook.keyboard_manager.disable();
-            $(".cke_top").show();
-        });
-        editor.on('blur', function( ev ) {
-            Jupyter.notebook.keyboard_manager.enable();
-        });
-        cell.element.find(".inner_cell").dblclick(function(event) {
-            is_wysiwyg_mode(cell) ? event.stopPropagation() : {};
-        });
-
-        // Save editor changes to model
-        editor.on('change', function( ev ) {
-            $(editor.element.$).find(".anchor-link").remove();
-            var cellData = editor.getData();
-            $(editor.element.$).closest(".cell").data("cell").code_mirror.setValue(cellData);
-        });
+                // Save editor changes to model
+                window.editor = editor;
+                editor.editing.model.document.on('change:data', (evt, name, value) => {
+                    $(editor.element.$).find(".anchor-link").remove();
+                    const cellData = editor.getData();
+                    cell.code_mirror.setValue(cellData);
+                });
+            } )
+            .catch( error => {
+                console.error( error );
+            } );
 
         // Change status
         toggle_button_mode(cell);
@@ -80,21 +74,27 @@ define([
      */
     function disable_wysiwyg_mode(cell) {
         // Get editor instance
-        var editor = cell.element.data("editor");
+        const editor = cell.element.data("editor");
         if (!editor) {
             console.log("ERROR: Could not get editor instance to destroy");
             return;
         }
 
         // Destroy the editor instance
-        editor.destroy();
+        editor.destroy().catch(error => {
+            console.log(error);
+        });
+
+        // Force the markdown to render
+        cell.unrender();
+        cell.render();
 
         // Change status
         toggle_button_mode(cell);
     }
 
     function toggle_button_mode(cell) {
-        var status = cell.element.find(".wysiwyg-status");
+        const status = cell.element.find(".wysiwyg-status");
         if (is_wysiwyg_mode(cell)) {
             status.removeClass("wysiwyg-on");
             status.addClass("wysiwyg-off");
@@ -119,7 +119,7 @@ define([
      */
     function is_wysiwyg_mode(cell) {
         // Get the status message of the cell
-        var status = cell.element.find(".wysiwyg-status");
+        const status = cell.element.find(".wysiwyg-status");
 
         // Return error if no status message
         if (status.length < 1) {
@@ -160,10 +160,10 @@ define([
     function add_wysiwyg_button(cell) {
         if (cell.cell_type === "markdown" && cell.rendered) {
             // Get the blank left area
-            var blank_area = cell.element.find(".input_prompt");
+            const blank_area = cell.element.find(".input_prompt");
 
             // Create the wrapper div
-            var wrapper = $("<div></div>")
+            const wrapper = $("<div></div>")
                 .css("position", "relative")
                 .css("top", -6)
                 .css("display", "block")
@@ -171,7 +171,7 @@ define([
                 .css("text-align", "center");
 
             // Create the WYSIWYG toggle button
-            var wysiwyg_button = $("<button></button>")
+            const wysiwyg_button = $("<button></button>")
                 .css("margin-right", 5)
                 .attr("title", "Rich Text Editing")
                 .addClass("btn btn-default btn-sm wysiwyg-toggle wysiwyg-status wysiwyg-off")
@@ -188,7 +188,7 @@ define([
                 })
                 .hide();
 
-            var done_button = $("<button></button>")
+            const done_button = $("<button></button>")
                 .attr("title", "Run Cell")
                 .addClass("btn btn-default btn-sm wysiwyg-done")
                 .append("<i class='fa-step-forward fa'></i>")
@@ -217,7 +217,7 @@ define([
      * Used when loading a notebook.
      */
     function attach_buttons() {
-        var all_cells = Jupyter.notebook.get_cells();
+        const all_cells = Jupyter.notebook.get_cells();
         $.each(all_cells, function(i, cell) {
             add_wysiwyg_button(cell);
         });
