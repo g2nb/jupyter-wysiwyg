@@ -1,7 +1,6 @@
 __author__ = 'Thorin Tabor'
 __copyright__ = 'Copyright 2016-2019, Regents of the University of California & Broad Institute'
-__version__ = '19.05'
-__status__ = 'Beta'
+__version__ = '19.07'
 __license__ = 'BSD'
 
 def _jupyter_server_extension_paths():
