@@ -54,7 +54,7 @@ define([
                 // Save editor changes to model
                 window.editor = editor;
                 editor.editing.model.document.on('change:data', (evt, name, value) => {
-                    $(editor.element.$).find(".anchor-link").remove();
+                    //$(editor.element.$).find(".anchor-link").remove();
                     const cellData = editor.getData();
                     cell.code_mirror.setValue(cellData);
                 });
