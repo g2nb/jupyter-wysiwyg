@@ -212,25 +212,54 @@ define([
         }
     }
 
+    function to_rich_text_cell() {
+        // Convert empty cell, otherwise add a new cell below
+        let cell = Jupyter.notebook.get_selected_cell();
+        const contents = cell.get_text().trim();
+
+        // Hack to get around weird behavior in dropdown menu when starting with a markdown cell
+        if (cell.cell_type === 'markdown') {
+            setTimeout(function() {
+                cell = Jupyter.notebook.get_selected_cell();
+                if (cell.cell_type !== 'markdown') {
+                    console.log("called hack");
+                    to_rich_text_cell();
+                }
+            }, 100);
+            return;
+        }
+
+        // Insert a new cell if the current one has contents
+        if (contents !== "") {
+            cell = Jupyter.notebook.insert_cell_below();
+            Jupyter.notebook.select_next();
+        }
+
+        // Make sure that the cell has the markdown cell type
+        if (cell.cell_type !== 'markdown') Jupyter.notebook.cells_to_markdown();
+
+        // Initialize the rich text editor
+        setTimeout(function() {
+            cell = Jupyter.notebook.get_selected_cell();
+            cell.element.find(".wysiwyg-toggle.wysiwyg-off").click();
+        }, 100);
+    }
+
     /**
      * Attach WYSIWYG mode buttons to all existing cells in the notebook.
      * Used when loading a notebook.
      */
     function attach_buttons() {
-        var all_cells = Jupyter.notebook.get_cells();
+        const all_cells = Jupyter.notebook.get_cells();
         $.each(all_cells, function(i, cell) {
             add_wysiwyg_button(cell);
         });
     }
 
     /**
-     * Load the WYSIWYG nbextension
+     * Attach WYSIWYG button when a new cell is created
      */
-    function load_ipython_extension() {
-        // Attach WYSIWYG buttons to existing cells when a notebook is loaded
-        attach_buttons();
-
-        // Attach WYSIWYG button when a new cell is created
+    function attach_events() {
         $([Jupyter.events]).on('create.Cell', function(event, target) {
             add_wysiwyg_button(target.cell);
             setTimeout(function() {
@@ -247,6 +276,58 @@ define([
         $([Jupyter.events]).on('command_mode.Cell', function(event, target) {
             if (target.cell.rendered) hide_wysiwyg_button(target.cell);
         });
+    }
+
+    /**
+     * Attach new cell type in menu
+     */
+    function attach_cell_type() {
+        // Add Rich Text "cell type" if not already in menu
+        const dropdown = $("#cell_type");
+        const rich_text_in_dropdown = dropdown.find("option:contains('Rich Text')").length > 0;
+        if (!rich_text_in_dropdown) {
+            dropdown.append(
+                    $("<option value='code'>Rich Text</option>")
+                );
+
+            dropdown.change(function(event) {
+                const type = $(event.target).find(":selected").text();
+                if (type === "Rich Text") {
+                    const former_type = Jupyter.notebook.get_selected_cell().cell_type;
+                    to_rich_text_cell(former_type);
+                }
+            });
+
+            // Ensure that our event is checked first
+            const event_array = $._data(dropdown[0], "events").change;
+            event_array.unshift(event_array.slice(-1).pop());
+        }
+
+        const cell_menu = $("#change_cell_type");
+        const rich_text_in_menu = cell_menu.find("#to_rich_text").length > 0;
+        if (!rich_text_in_menu) {
+            cell_menu.find("ul.dropdown-menu")
+                .append(
+                    $("<li id='to_rich_text' title='Insert a Rich Text editor cell'><a href='#'>Rich Text</a></option>")
+                        .click(function() {
+                            to_rich_text_cell();
+                        })
+                );
+        }
+    }
+
+    /**
+     * Load the WYSIWYG nbextension
+     */
+    function load_ipython_extension() {
+        // Attach WYSIWYG buttons to existing cells when a notebook is loaded
+        attach_buttons();
+
+        // Attach WYSIWYG button when a new cell is created
+        attach_events();
+
+        // Attach new cell type in menu
+        attach_cell_type();
     }
 
     return {
