@@ -222,7 +222,6 @@ define([
             setTimeout(function() {
                 cell = Jupyter.notebook.get_selected_cell();
                 if (cell.cell_type !== 'markdown') {
-                    console.log("called hack");
                     to_rich_text_cell();
                 }
             }, 100);
