@@ -18,7 +18,7 @@
 3. Run the following to register the deploy with PyPi:
 > python setup.py register
 4. Upload the files by running:
-> python setup.py sdist upload
+> python setup.py sdist bdist_wheel; twine upload dist/*
 5. If the upload fails go to [https://pypi.python.org/pypi](https://pypi.python.org/pypi) and manually upload dist/jupyter-wysiwyg-*.tar.gz.
 6. Test the deploy by uninstalling and reinstalling the package: 
 > sudo pip uninstall jupyter-wysiwyg;

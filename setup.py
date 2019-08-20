@@ -1,5 +1,13 @@
-from distutils.core import setup
+from setuptools import setup
 import os
+
+
+# Read version and other metadata from file
+__version__ = '19.07'
+
+
+with open('README.md') as f:
+    long_description = f.read()
 
 
 def get_data_files():
@@ -18,16 +26,18 @@ def get_data_files():
 
 setup(name='jupyter-wysiwyg',
       packages=['jupyter_wysiwyg'],
-      version='19.05',
+      version=__version__,
+      long_description=long_description,
+      long_description_content_type="text/markdown",
       description='WYSIWYG editing functionality for markdown/HTML cells in Jupyter',
       license='BSD',
       author='Thorin Tabor',
       author_email='thorin@broadinstitute.org',
       url='https://github.com/genepattern/jupyter-wysiwyg/tree/master/wysiwyg',
-      download_url='https://github.com/genepattern/jupyter-wysiwyg/archive/0.1.9.tar.gz',
+      download_url='https://github.com/genepattern/jupyter-wysiwyg/archive/' + __version__ + '.tar.gz',
       keywords=['genepattern', 'wysiwyg', 'ipython', 'jupyter'],
       classifiers=[
-          'Development Status :: 4 - Beta',
+          'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Science/Research',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: BSD License',
