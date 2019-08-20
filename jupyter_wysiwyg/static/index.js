@@ -37,8 +37,10 @@ define([
             branding: false,
             contextmenu: false,
             elementpath: false,
-            toolbar: 'fontselect fontsizeselect',
-            'init_instance_callback': function (editor) {
+            menubar: false,
+            height: 500,
+            toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons | bullist numlist outdent indent blockquote',
+            init_instance_callback: function (editor) {
                 editor.on('Change', function (e) {
                     console.log('Editor contents was changed.');
                     const content = editor.getContent();
@@ -49,12 +51,6 @@ define([
             // Attach editor to cell
             cell.element.data("editor", editor[0]);
 
-            // Save editor changes to model
-            // editor.editing.model.document.on('change:data', (evt, name, value) => {
-            //     //$(editor.element.$).find(".anchor-link").remove();
-            //     const cellData = editor.getData();
-            //     cell.code_mirror.setValue(cellData);
-            // });
         }).catch( error => {
             console.error( error );
         });
