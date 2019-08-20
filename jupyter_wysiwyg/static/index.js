@@ -4,7 +4,11 @@ const WYSIWYG_PATH = location.origin + Jupyter.contents.base_url + "nbextensions
 define([
     "base/js/namespace",
     "jquery",
-    WYSIWYG_PATH + "ckeditor/ckeditor.js"], function(Jupyter, $, CKEDITOR) {
+    WYSIWYG_PATH + "tinymce/tinymce.min.js"], function(Jupyter, $, TinyMCE) {
+
+    function gen_id(prefix) {
+        return prefix + '_' + Math.random().toString(36).substr(2, 9);
+    }
 
     /**
      * Take a Markdown cell and initialize WYSIWYG mode for the cell
@@ -25,50 +29,42 @@ define([
         // Special case for placeholder text in empty cells
         if (cell.get_text().length === 0) textbox.empty();
 
-        // function Markdown( editor ) {
-        //     editor.data.processor = new CKEDITOR.GFMDataProcessor();
-        // }
-
-        // Initialize CKEditor
-        CKEDITOR.create(textbox[0], {
-                //extraPlugins: [Markdown]
-            })
-            .then( editor => {
-                // Attach editor to cell
-                cell.element.data("editor", editor);
-
-                // Editor settings
-                // editor.on('instanceReady', function( ev ) {
-                //     editor.setReadOnly(false);
-                // });
-
-                // Editor keyboard events
-                editor.editing.view.document.on('change:isFocused', (evt, name, value) => {
-                    if (value) Jupyter.notebook.keyboard_manager.disable();
-                    else Jupyter.notebook.keyboard_manager.enable();
+        const id = gen_id('editor');
+        textbox.attr('id', id);
+        tinymce.init({
+            selector: '#' + id,
+            content_css : location.origin + Jupyter.contents.base_url + 'static/style/style.min.css',
+            branding: false,
+            contextmenu: false,
+            elementpath: false,
+            toolbar: 'fontselect fontsizeselect',
+            'init_instance_callback': function (editor) {
+                editor.on('Change', function (e) {
+                    console.log('Editor contents was changed.');
+                    const content = editor.getContent();
+                    cell.code_mirror.setValue(content);
                 });
-                cell.element.find(".inner_cell").dblclick(function(event) {
-                    is_wysiwyg_mode(cell) ? event.stopPropagation() : {};
-                });
+            }
+        }).then(editor => {
+            // Attach editor to cell
+            cell.element.data("editor", editor[0]);
 
-                // Save editor changes to model
-                window.editor = editor;
-                editor.editing.model.document.on('change:data', (evt, name, value) => {
-                    //$(editor.element.$).find(".anchor-link").remove();
-                    const cellData = editor.getData();
-                    cell.code_mirror.setValue(cellData);
-                });
-            } )
-            .catch( error => {
-                console.error( error );
-            } );
+            // Save editor changes to model
+            // editor.editing.model.document.on('change:data', (evt, name, value) => {
+            //     //$(editor.element.$).find(".anchor-link").remove();
+            //     const cellData = editor.getData();
+            //     cell.code_mirror.setValue(cellData);
+            // });
+        }).catch( error => {
+            console.error( error );
+        });
 
         // Change status
         toggle_button_mode(cell);
     }
 
     /**
-     * Gracefully tear down the CKEditor instance used for WYSIWYG mode
+     * Gracefully tear down the TinyMCE instance used for WYSIWYG mode
      *
      * @param cell
      */
@@ -80,10 +76,8 @@ define([
             return;
         }
 
-        // Destroy the editor instance
-        editor.destroy().catch(error => {
-            console.log(error);
-        });
+        // Remove the editor instance
+        editor.remove();
 
         // Force the markdown to render
         cell.unrender();
