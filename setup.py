@@ -3,7 +3,7 @@ import os
 
 
 # Read version and other metadata from file
-__version__ = '19.07'
+__version__ = '19.08'
 
 
 with open('README.md') as f:
@@ -50,24 +50,24 @@ setup(name='jupyter-wysiwyg',
       ],
       package_dir={'jupyter_wysiwyg': 'jupyter_wysiwyg'},
       package_data={'jupyter_wysiwyg': ['static/*.js',
-                                        'static/ckeditor/*.js',
-                                        'static/ckeditor/*.md',
-                                        'static/ckeditor/*.css',
-                                        'static/ckeditor/*/*.js',
-                                        'static/ckeditor/*/*.css',
-                                        'static/ckeditor/*/*.png',
-                                        'static/ckeditor/*/*.gif',
-                                        'static/ckeditor/*/*/*.js',
-                                        'static/ckeditor/*/*/*.css',
-                                        'static/ckeditor/*/*/*.png',
-                                        'static/ckeditor/*/*/*.gif',
-                                        'static/ckeditor/*/*/*/*.js',
-                                        'static/ckeditor/*/*/*/*.css',
-                                        'static/ckeditor/*/*/*/*.png',
-                                        'static/ckeditor/*/*/*/*.gif',
-                                        'static/ckeditor/*/*/*/*/*.js'
-                                        'static/ckeditor/*/*/*/*/*.css'
-                                        'static/ckeditor/*/*/*/*/*.png'
-                                        'static/ckeditor/*/*/*/*/*.gif']},
+                                        'static/tinymce/*.js',
+                                        'static/tinymce/*.md',
+                                        'static/tinymce/*.css',
+                                        'static/tinymce/*/*.js',
+                                        'static/tinymce/*/*.css',
+                                        'static/tinymce/*/*.png',
+                                        'static/tinymce/*/*.gif',
+                                        'static/tinymce/*/*/*.js',
+                                        'static/tinymce/*/*/*.css',
+                                        'static/tinymce/*/*/*.png',
+                                        'static/tinymce/*/*/*.gif',
+                                        'static/tinymce/*/*/*/*.js',
+                                        'static/tinymce/*/*/*/*.css',
+                                        'static/tinymce/*/*/*/*.png',
+                                        'static/tinymce/*/*/*/*.gif',
+                                        'static/tinymce/*/*/*/*/*.js'
+                                        'static/tinymce/*/*/*/*/*.css'
+                                        'static/tinymce/*/*/*/*/*.png'
+                                        'static/tinymce/*/*/*/*/*.gif']},
       data_files=get_data_files(),
       )
