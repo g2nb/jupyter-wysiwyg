@@ -51,6 +51,10 @@ define([
             // Attach editor to cell
             cell.element.data("editor", editor[0]);
 
+            // Prevent double-click bug
+            cell.element.find(".inner_cell").dblclick(function(event) {
+                is_wysiwyg_mode(cell) ? event.stopPropagation() : {};
+            });
         }).catch( error => {
             console.error( error );
         });
