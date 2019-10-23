@@ -3,7 +3,7 @@ import os
 
 
 # Read version and other metadata from file
-__version__ = '19.08'
+__version__ = '19.10'
 
 
 with open('README.md') as f:
