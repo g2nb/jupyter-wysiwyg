@@ -206,22 +206,10 @@ define([
         }
     }
 
-    function to_rich_text_cell() {
+    function to_rich_text_cell(former_type) {
         // Convert empty cell, otherwise add a new cell below
         let cell = Jupyter.notebook.get_selected_cell();
         const contents = cell.get_text().trim();
-
-        // Hack to get around weird behavior in dropdown menu when starting with a markdown cell
-        if (cell.cell_type === 'markdown') {
-            setTimeout(function() {
-                cell = Jupyter.notebook.get_selected_cell();
-                if (cell.cell_type !== 'markdown') {
-                    to_rich_text_cell();
-                }
-            }, 100);
-            return;
-        }
-
         // Insert a new cell if the current one has contents
         if (contents !== "") {
             cell = Jupyter.notebook.insert_cell_below();
@@ -288,6 +276,7 @@ define([
                 if (type === "Rich Text") {
                     const former_type = Jupyter.notebook.get_selected_cell().cell_type;
                     to_rich_text_cell(former_type);
+                    event.stopPropagation();
                 }
             });
 
