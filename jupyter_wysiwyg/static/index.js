@@ -257,6 +257,20 @@ define([
         $([Jupyter.events]).on('command_mode.Cell', function(event, target) {
             if (target.cell.rendered) hide_wysiwyg_button(target.cell);
         });
+        $("button[title=Run]").click(() => {
+            Jupyter.notebook.get_cells().forEach(cell => {
+                if (cell.element.hasClass("rendered")) hide_wysiwyg_button(cell);
+            });
+        });
+        $(document).keydown(function (event) {
+            if (event.keyCode === 13 && event.shiftKey) {
+                setTimeout(() => {
+                    Jupyter.notebook.get_cells().forEach(cell => {
+                        if (cell.element.hasClass("rendered")) hide_wysiwyg_button(cell);
+                    });
+                }, 100);
+            }
+        });
     }
 
     /**
