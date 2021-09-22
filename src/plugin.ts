@@ -1,14 +1,14 @@
 import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
-import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
-import EditorContentFactory from './editor';
+import { INotebookTracker } from '@jupyterlab/notebook';
+import { EditorContentFactory, IEditorContentFactory } from './editor';
 import "../style/index.css";
 
 /**
  * The jupyter-wysiwyg plugins
  */
-const wysiwyg_plugin: JupyterFrontEndPlugin<NotebookPanel.IContentFactory> = {
+const wysiwyg_plugin: JupyterFrontEndPlugin<IEditorContentFactory> = {
     id: "@genepattern/jupyter-wysiwyg:plugin",
-    // provides: NotebookPanel.IContentFactory,
+    provides: IEditorContentFactory,
     requires: [INotebookTracker],
     optional: [],
     activate: activate_plugin,
