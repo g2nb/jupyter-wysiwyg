@@ -1,32 +1,93 @@
-from distutils.core import setup
+import json
+import logging
+import setuptools
+import sys
+from pathlib import Path
 
-setup(name='jupyter-wysiwyg',
-      packages=['jupyter_wysiwyg'],
-      version='0.1.4',
-      description='WYSIWYG editing functionality for markdown/HTML cells in Jupyter',
-      license='BSD',
-      author='Thorin Tabor',
-      author_email='thorin@broadinstitute.org',
-      url='https://github.com/genepattern/jupyter-wysiwyg/tree/master/wysiwyg',
-      download_url='https://github.com/genepattern/jupyter-wysiwyg/archive/0.1.4.tar.gz',
-      keywords=['genepattern', 'wysiwyg', 'ipython', 'jupyter'],
-      classifiers=[
-          'Development Status :: 4 - Beta',
-          'Intended Audience :: Science/Research',
-          'Intended Audience :: Developers',
-          'License :: OSI Approved :: BSD License',
-          'Programming Language :: Python',
-          'Framework :: IPython',
-      ],
-      install_requires=[
-          'jupyter',
-          'notebook>=4.2.0',
-      ],
-      package_dir={'jupyter_wysiwyg': 'jupyter_wysiwyg'},
-      package_data={'jupyter_wysiwyg': ['static/*',
-                                        'static/*/*',
-                                        'static/*/*/*',
-                                        'static/*/*/*/*',
-                                        'static/*/*/*/*/*',
-                                        'static/*/*/*/*/*/*']},
-      )
+
+HERE = Path(__file__).parent.resolve()
+
+# The name of the project
+name = "jupyter-wysiwyg"
+
+lab_path = (HERE / name / "labextension")
+
+# Representative files that should exist after a successful build
+jstargets = [
+    (HERE / 'lib' / 'plugin.js'),
+    str(lab_path / "package.json"),
+]
+
+package_data_spec = {
+    name: ["*"],
+}
+
+labext_name = "@genepattern/jupyter-wysiwyg"
+
+data_files_spec = [
+    ("share/jupyter/labextensions/%s" % labext_name, str(lab_path), "**"),
+    ("share/jupyter/labextensions/%s" % labext_name, str(HERE), "install.json"),
+]
+
+ensured_targets = [
+    str(lab_path / "package.json"),
+    str(lab_path / "static/style.js")
+]
+
+long_description = (HERE / "README.md").read_text()
+
+# Get the package info from package.json
+pkg_json = json.loads((HERE / "package.json").read_bytes())
+
+setup_args = dict(
+    name=name,
+    version=pkg_json["version"],
+    url=pkg_json["homepage"],
+    author=pkg_json["author"]["name"],
+    author_email=pkg_json["author"]["email"],
+    description=pkg_json["description"],
+    license=pkg_json["license"],
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    packages=setuptools.find_packages(),
+    install_requires=[
+        "jupyterlab~=3.1",
+    ],
+    zip_safe=False,
+    include_package_data=True,
+    python_requires=">=3.6",
+    platforms="Linux, Mac OS X, Windows",
+    keywords=["Jupyter", "JupyterLab", "JupyterLab3"],
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Framework :: Jupyter",
+    ],
+)
+
+try:  # Import here and wrap in try block in case jupyter_packaging isn't installed on dev machine
+    from jupyter_packaging import (
+        wrap_installers,
+        npm_builder,
+        get_data_files
+    )
+    post_develop = npm_builder(
+        build_cmd="install:extension", source_dir="src", build_dir=lab_path
+    )
+    setup_args["cmdclass"] = wrap_installers(post_develop=post_develop, ensured_targets=ensured_targets)
+    setup_args["data_files"] = get_data_files(data_files_spec)
+except ImportError as e:
+    logging.basicConfig(format="%(levelname)s: %(message)s")
+    logging.warning("Build tool `jupyter-packaging` is missing. Install it with pip or conda.")
+    if not ("--name" in sys.argv or "--version" in sys.argv):
+        raise e
+
+if __name__ == "__main__":
+    setuptools.setup(**setup_args)

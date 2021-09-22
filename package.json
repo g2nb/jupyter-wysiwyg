@@ -1,0 +1,122 @@
+{
+  "name": "@genepattern/jupyter-wysiwyg",
+  "version": "21.9.0-beta.1",
+  "description": "WYSIWYG editing functionality for markdown/HTML cells in Jupyter",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "widgets"
+  ],
+  "files": [
+    "lib/**/*.{js,css}",
+    "style/*.{js,css,png,svg}",
+    "schema/**/*.json",
+    "dist/*.{js,css}",
+    "style/index.js"
+  ],
+  "homepage": "https://github.com/genepattern/jupyter-wysiwyg",
+  "bugs": {
+    "url": "https://github.com/genepattern/jupyter-wysiwyg/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": {
+    "name": "Thorin Tabor",
+    "email": "tmtabor@cloud.ucsd.edu"
+  },
+  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
+  "style": "style/index.css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/genepattern/jupyter-wysiwyg"
+  },
+  "scripts": {
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:all": "jlpm run build:lib && jlpm run build:labextension",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc",
+    "clean": "jlpm run clean:lib",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "clean:labextension": "rimraf jupyter-wysiwyg/labextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "eslint:check": "eslint . --ext .ts,.tsx",
+    "install:extension": "jlpm run build",
+    "prepack": "jlpm run build:lib",
+    "prepare": "jlpm run clean && jlpm run build:all",
+    "test": "jlpm run test:firefox",
+    "test:chrome": "karma start --browsers=Chrome tests/karma.conf.js",
+    "test:debug": "karma start --browsers=Chrome --singleRun=false --debug=true tests/karma.conf.js",
+    "test:firefox": "karma start --browsers=Firefox tests/karma.conf.js",
+    "test:ie": "karma start --browsers=IE tests/karma.conf.js",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:labextension": "jupyter labextension watch .",
+    "watch:lib": "tsc -w",
+    "watch:src": "tsc -w"
+  },
+  "dependencies": {
+    "@jupyter-widgets/base": "^4.0.0",
+    "@jupyterlab/application": "^3.0.4",
+    "@jupyterlab/mainmenu": "^3.0.3",
+    "@jupyterlab/notebook": "^3.0.4"
+  },
+  "devDependencies": {
+    "@jupyterlab/apputils": "^3.0.3",
+    "@jupyterlab/builder": "^3.0.0",
+    "@jupyterlab/ui-components": "^3.0.3",
+    "@lumino/application": "^1.13.1",
+    "@lumino/widgets": "^1.16.1",
+    "@types/backbone": "^1.4.4",
+    "@types/node": "^14.14.27",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
+    "backbone": "^1.2.3",
+    "css-loader": "^5.0.2",
+    "eslint": "^7.14.0",
+    "expect.js": "^0.3.1",
+    "file-loader": "^6.2.0",
+    "fs-extra": "^9.1.0",
+    "karma": "^6.1.1",
+    "karma-typescript": "^5.3.0",
+    "mkdirp": "^1.0.4",
+    "mocha": "^8.3.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "source-map-loader": "^2.0.1",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^8.0.17",
+    "typescript": "~4.1.3",
+    "webpack": "^5.21.2",
+    "webpack-cli": "^4.5.0"
+  },
+  "jupyterlab": {
+    "extension": "lib/plugin",
+    "schemaDir": "schema",
+    "sharedPackages": {
+      "@jupyter-widgets/base": {
+        "bundled": false,
+        "singleton": true
+      }
+    },
+    "discovery": {
+      "kernel": [
+        {
+          "kernel_spec": {
+            "language": "^python"
+          },
+          "base": {
+            "name": "jupyter-wysiwyg"
+          },
+          "managers": [
+            "pip",
+            "conda"
+          ]
+        }
+      ]
+    },
+    "outputDir": "jupyter-wysiwyg/labextension"
+  },
+  "styleModule": "style/index.js"
+}
