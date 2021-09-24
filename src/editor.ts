@@ -85,7 +85,6 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     readonly edgeRequested = new Signal<this, CodeEditor.EdgeLocation>(this);
     readonly host: HTMLElement;
     readonly isDisposed: boolean;
-    readonly lineCount: number;
     readonly lineHeight: number;
 
     get view() { return this._view; }
