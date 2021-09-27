@@ -1,57 +1,34 @@
-import { NotebookPanel, StaticNotebook } from "@jupyterlab/notebook";
-import { Cell, MarkdownCell, IMarkdownCellModel } from "@jupyterlab/cells";
-import { IStateDB } from '@jupyterlab/statedb';
 import { CodeEditor } from "@jupyterlab/codeeditor";
-import { CommandRegistry } from "@lumino/commands";
-import { Token, UUID } from "@lumino/coreutils";
-import { IDisposable } from "@lumino/disposable";
+import { IMarkdownCellModel } from "@jupyterlab/cells";
+import { UUID } from "@lumino/coreutils";
 import { Signal } from "@lumino/signaling";
-import { Widget } from "@lumino/widgets";
+import { IDisposable } from "@lumino/disposable";
 
-export class EditorContentFactory extends NotebookPanel.ContentFactory implements IEditorContentFactory {
-    constructor(options?: Cell.ContentFactory.IOptions | undefined) {
-        super(options);
-    }
+ /* Import TinyMCE */
+import TinyMCE from "tinymce";
+import {JSONValue} from "@lumino/coreutils/src/json";
 
-    /**
-     * Create a markdown cell with the WYSIWYG editor rather than CodeMirror
-     *
-     * @param options
-     * @param parent
-     */
-    createMarkdownCell(options: MarkdownCell.IOptions, parent: StaticNotebook): MarkdownCell {
-        console.log('overridden markdown cell created');
-        let model = options.model;
-        let wysiwyg_editor = (options: CodeEditor.IOptions) => {
-            return new TinyMCEEditor(options, model);
-        };
+/* Default icons are required for TinyMCE 5.3 or above */
+import 'tinymce/icons/default';
 
-        let content_factory = new EditorContentFactory({editorFactory: wysiwyg_editor} as Cell.ContentFactory.IOptions);
-        options.contentFactory = content_factory;
+/* A theme is also required */
+import 'tinymce/themes/silver';
 
-        return new MarkdownCell(options).initializeState();
-      }
-}
+/* Import the skin */
+import 'tinymce/skins/ui/oxide/skin.css';
 
-export const IEditorContentFactory = new Token<IEditorContentFactory>("jupyter-wysiwyg");
+/* Import plugins */
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/emoticons';
+import 'tinymce/plugins/emoticons/js/emojis';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/table';
 
-export interface IEditorContentFactory extends NotebookPanel.IContentFactory {}
-
-export class EditorWidget extends Widget {
-    constructor(commands: CommandRegistry) {
-        super();
-    }
-
-    render_menu(activeCell: Cell, state: IStateDB, commands: CommandRegistry) {
-        console.log("render_menu() called");
-        // TODO: Implement
-    }
-
-    render_inactive_menu(state: IStateDB) {
-        console.log("render_inactive_menu() called");
-        // TODO: Implement
-    }
-}
+/* Import content css */
+// import contentUiCss from 'tinymce/skins/ui/oxide/content.css';
+// import contentCss from 'tinymce/skins/content/default/content.css';
 
 export class TinyMCEEditor implements CodeEditor.IEditor {
     constructor(options: TinyMCEEditor.IOptions, markdownModel: IMarkdownCellModel) {
@@ -131,7 +108,12 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     }
 
     getCursorPosition(): CodeEditor.IPosition {
-        return undefined;
+        // This is a dummy implementation that prevents an error in the console
+        return new class implements CodeEditor.IPosition {
+            [key: string]: JSONValue;
+            line: 0;
+            column: 0;
+        }();
     }
 
     getLine(line: number): string | undefined {
@@ -214,7 +196,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
 
     static create_editor(host: HTMLElement, model: CodeEditor.IModel):TinyMCEView {
         // TODO: Implement
-        return new TinyMCEView();
+        return new TinyMCEView(host, model);
     }
 }
 
@@ -227,6 +209,37 @@ export namespace TinyMCEEditor {
 
 export class TinyMCEView {
     // TODO: Implement
+    constructor(host: HTMLElement, model: CodeEditor.IModel) {
+        // Create the wrapper
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = model.value.text;
+        host.appendChild(wrapper);
+
+        // Wait for cell initialization before initializing editor
+        setTimeout(() => {
+            TinyMCE.init({
+                target: wrapper,
+                skin: false,
+                content_css : false,
+                // content_style: contentUiCss.toString() + '\n' + contentCss.toString(),
+                branding: false,
+                contextmenu: false,
+                elementpath: false,
+                menubar: false,
+                height: 500,
+                resize: false,
+                toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons | bullist numlist outdent indent blockquote',
+                init_instance_callback: function (editor: any) {
+                    editor.on('Change', function (e: any) {
+                        console.log('Editor contents was changed.');
+                        model.value.text = editor.getContent();
+                    });
+                }
+            }).then(editor => {
+                // xxx
+            });
+        }, 500);
+    }
 
     blur() {}
     focus() {}

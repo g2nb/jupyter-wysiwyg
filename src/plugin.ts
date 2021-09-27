@@ -2,7 +2,7 @@ import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application'
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 import { MarkdownCell } from '@jupyterlab/cells';
 import { IStateDB } from '@jupyterlab/statedb';
-import { EditorContentFactory, IEditorContentFactory, EditorWidget } from './editor';
+import { EditorContentFactory, IEditorContentFactory, EditorWidget } from './factory';
 import "../style/index.css";
 
 /**

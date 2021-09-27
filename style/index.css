@@ -1,0 +1,7 @@
+.jp-TinyMCE {
+    padding-right: 0;
+}
+
+.jp-TinyMCE > .tox-tinymce {
+    margin-bottom: 0;
+}

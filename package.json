@@ -60,7 +60,8 @@
     "@jupyter-widgets/base": "^4.0.0",
     "@jupyterlab/application": "^3.0.4",
     "@jupyterlab/mainmenu": "^3.0.3",
-    "@jupyterlab/notebook": "^3.0.4"
+    "@jupyterlab/notebook": "^3.0.4",
+    "tinymce": "^5.9.2"
   },
   "devDependencies": {
     "@jupyterlab/apputils": "^3.0.3",
