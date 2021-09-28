@@ -23,7 +23,7 @@ const add_wysiwyg: JupyterFrontEndPlugin<IEditorContentFactory> = {
 };
 
 function activate_editor(app: JupyterFrontEnd, tracker: INotebookTracker, state: IStateDB) {
-    console.log('WYSIWYG Activated!');
+    console.log('jupyter-wysiwyg plugin activated!');
     let editor_widget = new EditorWidget(app.commands);
 
     // When the current notebook is changed
@@ -46,7 +46,7 @@ function activate_editor(app: JupyterFrontEnd, tracker: INotebookTracker, state:
 }
 
 function override_editor(app: JupyterFrontEnd):EditorContentFactory {
-    console.log('WYSIWYG Override Activated!');
+    console.log('jupyter-wysiwyg override activated!');
     return new EditorContentFactory();
 }
 

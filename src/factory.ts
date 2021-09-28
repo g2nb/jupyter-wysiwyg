@@ -19,14 +19,12 @@ export class EditorContentFactory extends NotebookPanel.ContentFactory implement
      * @param parent
      */
     createMarkdownCell(options: MarkdownCell.IOptions, parent: StaticNotebook): MarkdownCell {
-        console.log('overridden markdown cell created');
-        let model = options.model;
-        let wysiwyg_editor = (options: CodeEditor.IOptions) => {
-            return new TinyMCEEditor(options, model);
-        };
-
-        let content_factory = new EditorContentFactory({editorFactory: wysiwyg_editor} as Cell.ContentFactory.IOptions);
-        options.contentFactory = content_factory;
+        const model = options.model;
+        options.contentFactory = new EditorContentFactory({
+            editorFactory: (options: CodeEditor.IOptions) => {
+                return new TinyMCEEditor(options, model);
+            }
+        } as Cell.ContentFactory.IOptions);
 
         return new MarkdownCell(options).initializeState();
       }
