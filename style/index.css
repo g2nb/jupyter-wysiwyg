@@ -5,3 +5,11 @@
 .jp-TinyMCE > .tox-tinymce {
     margin-bottom: 0;
 }
+
+.jp-RenderButton {
+    cursor: pointer;
+}
+
+.jp-RenderButton:hover {
+    background-color: var(--jp-layout-color2);
+}

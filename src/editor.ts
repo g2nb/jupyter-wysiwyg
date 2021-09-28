@@ -64,8 +64,8 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     set uuid(value) { this._uuid = value; }
     set selectionStyle(value) { this._selection_style = value; }
 
-    blur(): void { this._view.blur(); }
-    focus(): void { this._view.focus(); }
+    blur(): void { if (this._view) this._view.blur(); }
+    focus(): void { if (this._view) this._view.focus(); }
 
     addKeydownHandler(handler: (instance: CodeEditor.IEditor, event: KeyboardEvent) => boolean): IDisposable {
         this._keydownHandlers.push(handler);
@@ -108,7 +108,9 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     hasFocus(): boolean { return false; }
     newIndentedLine(): void {}
     redo(): void {}
-    refresh(): void {}
+    refresh(): void {
+        console.log("EDITOR REFRESHED");
+    }
     resizeToFit(): void {}
     revealPosition(position: CodeEditor.IPosition): void {}
     revealSelection(selection: CodeEditor.IRange): void {}
@@ -128,6 +130,9 @@ export namespace TinyMCEEditor {
 
 export class TinyMCEView {
     constructor(host: HTMLElement, model: CodeEditor.IModel) {
+        this._host = host;
+        this._model = model;
+
         // Create the wrapper for TinyMCE
         const wrapper = document.createElement("div");
         wrapper.innerHTML = model.value.text;
@@ -149,11 +154,31 @@ export class TinyMCEView {
                 toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons | bullist numlist outdent indent blockquote',
                 init_instance_callback: (editor: any) => editor.on('Change', () => model.value.text = editor.getContent())
             }).then(editor => {
-                // xxx
+                console.log("EDITOR");
+                console.log(editor);
+                if (!editor.length) return; // If no valid editors, do nothing
+                editor[0].on("focus", () => {
+                    console.log("FOCUS CALLBACK");
+                    console.log(this._host.parentElement);
+                    // INotebookTracker.currentWidget.content.activeCellIndex = 3
+                    this._host.parentElement.click();
+                    // this.focus();
+                });
             });
         }, 500);
     }
 
-    blur() {}
-    focus() {}
+    private _host: HTMLElement;
+    private _model: CodeEditor.IModel;
+
+    blur() {
+        console.log("HOST");
+        console.log(this._host);
+    }
+
+    focus() {
+        console.log("MODEL");
+        console.log(this._model);
+        // this.sidebar().append("HELLO");
+    }
 }
