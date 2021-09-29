@@ -137,9 +137,6 @@ export namespace TinyMCEEditor {
 
 export class TinyMCEView {
     constructor(host: HTMLElement, model: CodeEditor.IModel) {
-        this._host = host;
-        this._model = model;
-
         // Create the wrapper for TinyMCE
         const wrapper = document.createElement("div");
         wrapper.innerHTML = model.value.text;
@@ -162,15 +159,11 @@ export class TinyMCEView {
                     toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons | bullist numlist outdent indent blockquote',
                     init_instance_callback: (editor: any) => editor.on('Change', () => model.value.text = editor.getContent())
                 }).then(editor => {
-                    console.log("EDITOR");
-                    console.log(editor);
                     if (!editor.length) return; // If no valid editors, do nothing
                     editor[0].on("focus", () => {
-                        console.log("FOCUS CALLBACK");
-                        console.log(this._host.parentElement);
-                        // INotebookTracker.currentWidget.content.activeCellIndex = 3
-                        this._host.parentElement.click();
-                        // this.focus();
+                        const index = this.get_cell_index(model);
+                        if (index !== null)
+                            EditorWidget.instance().tracker.currentWidget.content.activeCellIndex = index;
                     });
                 });
             }
@@ -180,17 +173,18 @@ export class TinyMCEView {
         }, 500);
     }
 
-    private _host: HTMLElement;
-    private _model: CodeEditor.IModel;
+    blur() {}
 
-    blur() {
-        console.log("HOST");
-        console.log(this._host);
-    }
+    focus() {}
 
-    focus() {
-        console.log("MODEL");
-        console.log(this._model);
-        // this.sidebar().append("HELLO");
+    get_cell_index(model: CodeEditor.IModel) {
+        const id = model.modelDB.basePath;
+        const all_cells = EditorWidget.instance().tracker.currentWidget.content.widgets;
+        for (let i = 0; i < all_cells.length; i++) {
+            const cell = all_cells[i];
+            const cell_id = cell.model.modelDB.basePath;
+            if (id === cell_id) return i;
+        }
+        return null;
     }
 }
