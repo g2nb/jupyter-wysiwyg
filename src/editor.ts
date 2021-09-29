@@ -1,10 +1,11 @@
 import { CodeEditor } from "@jupyterlab/codeeditor";
-import { IMarkdownCellModel } from "@jupyterlab/cells";
+import {IMarkdownCellModel, MarkdownCell} from "@jupyterlab/cells";
 import { UUID } from "@lumino/coreutils";
 import { Signal } from "@lumino/signaling";
 import { IDisposable, DisposableDelegate } from "@lumino/disposable";
 import { ArrayExt } from '@lumino/algorithm';
 import { JSONValue } from "@lumino/coreutils/src/json";
+import { EditorWidget } from "./factory";
 
 // Import TinyMCE
 import TinyMCE from "tinymce";
@@ -83,6 +84,15 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
         Signal.clearData(this);
     }
 
+    // Called when a markdown cell is either first endered or toggled into editor mode
+    refresh(): void {
+        const active_cell = EditorWidget.instance().tracker.activeCell;
+        if (active_cell instanceof MarkdownCell && !active_cell.rendered && EditorWidget.instance().no_side_button()) {
+            active_cell.editor.focus();
+            EditorWidget.instance().render_side_button();
+        }
+    }
+
     // This is a dummy implementation that prevents an error in the console
     getCursorPosition(): CodeEditor.IPosition {
         return new class implements CodeEditor.IPosition {
@@ -108,9 +118,6 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     hasFocus(): boolean { return false; }
     newIndentedLine(): void {}
     redo(): void {}
-    refresh(): void {
-        console.log("EDITOR REFRESHED");
-    }
     resizeToFit(): void {}
     revealPosition(position: CodeEditor.IPosition): void {}
     revealSelection(selection: CodeEditor.IRange): void {}
@@ -140,31 +147,36 @@ export class TinyMCEView {
 
         // Wait for cell initialization before initializing editor
         setTimeout(() => {
-            TinyMCE.init({
-                target: wrapper,
-                skin: false,
-                content_css : false,
-                // content_style: contentUiCss.toString() + '\n' + contentCss.toString(),
-                branding: false,
-                contextmenu: false,
-                elementpath: false,
-                menubar: false,
-                height: 500,
-                resize: false,
-                toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons | bullist numlist outdent indent blockquote',
-                init_instance_callback: (editor: any) => editor.on('Change', () => model.value.text = editor.getContent())
-            }).then(editor => {
-                console.log("EDITOR");
-                console.log(editor);
-                if (!editor.length) return; // If no valid editors, do nothing
-                editor[0].on("focus", () => {
-                    console.log("FOCUS CALLBACK");
-                    console.log(this._host.parentElement);
-                    // INotebookTracker.currentWidget.content.activeCellIndex = 3
-                    this._host.parentElement.click();
-                    // this.focus();
+            try {
+                TinyMCE.init({
+                    target: wrapper,
+                    skin: false,
+                    content_css: false,
+                    // content_style: contentUiCss.toString() + '\n' + contentCss.toString(),
+                    branding: false,
+                    contextmenu: false,
+                    elementpath: false,
+                    menubar: false,
+                    height: 500,
+                    resize: false,
+                    toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons | bullist numlist outdent indent blockquote',
+                    init_instance_callback: (editor: any) => editor.on('Change', () => model.value.text = editor.getContent())
+                }).then(editor => {
+                    console.log("EDITOR");
+                    console.log(editor);
+                    if (!editor.length) return; // If no valid editors, do nothing
+                    editor[0].on("focus", () => {
+                        console.log("FOCUS CALLBACK");
+                        console.log(this._host.parentElement);
+                        // INotebookTracker.currentWidget.content.activeCellIndex = 3
+                        this._host.parentElement.click();
+                        // this.focus();
+                    });
                 });
-            });
+            }
+            catch (e) {
+                console.log("TinyMCE threw an error: " + e);
+            }
         }, 500);
     }
 

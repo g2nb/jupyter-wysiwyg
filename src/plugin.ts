@@ -1,6 +1,6 @@
 import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
-import { Cell, MarkdownCell } from '@jupyterlab/cells';
+import { MarkdownCell } from '@jupyterlab/cells';
 import { IStateDB } from '@jupyterlab/statedb';
 import { EditorContentFactory, IEditorContentFactory, EditorWidget } from './factory';
 import "../style/index.css";
@@ -24,8 +24,7 @@ const add_wysiwyg: JupyterFrontEndPlugin<IEditorContentFactory> = {
 
 function activate_editor(app: JupyterFrontEnd, tracker: INotebookTracker, state: IStateDB) {
     console.log('jupyter-wysiwyg plugin activated!');
-    let editor_widget = new EditorWidget(app.commands);
-    let previous_cell: Cell | null = null;
+    EditorWidget.instance().tracker = tracker;
 
     // When the current notebook is changed
     tracker.currentChanged.connect(() => {
@@ -34,16 +33,13 @@ function activate_editor(app: JupyterFrontEnd, tracker: INotebookTracker, state:
         // When the cell is changed
         tracker.activeCellChanged.connect(() => {
             const active_cell = tracker.activeCell;
-            const active_notebook = tracker.currentWidget;
-            if (active_cell instanceof MarkdownCell && !active_cell.rendered) {
+            if (active_cell instanceof MarkdownCell && !active_cell.rendered && EditorWidget.instance().no_side_button()) {
                 active_cell.editor.focus();
-                editor_widget.render_side_button(active_cell, active_notebook);
-                editor_widget.remove_side_button(previous_cell);
-                previous_cell = active_cell;
+                EditorWidget.instance().render_side_button();
+                EditorWidget.instance().remove_side_button();
             }
             else {
-                editor_widget.remove_side_button(previous_cell);
-                previous_cell = active_cell;
+                EditorWidget.instance().remove_side_button();
             }
         });
     });

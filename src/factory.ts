@@ -1,7 +1,6 @@
-import { NotebookActions, NotebookPanel, StaticNotebook } from "@jupyterlab/notebook";
+import {INotebookTracker, NotebookActions, NotebookPanel, StaticNotebook} from "@jupyterlab/notebook";
 import { Cell, MarkdownCell } from "@jupyterlab/cells";
 import { CodeEditor } from "@jupyterlab/codeeditor";
-import { CommandRegistry } from "@lumino/commands";
 import { Token } from "@lumino/coreutils";
 import { Widget } from "@lumino/widgets";
 import { TinyMCEEditor } from "./editor";
@@ -35,20 +34,52 @@ export const IEditorContentFactory = new Token<IEditorContentFactory>("jupyter-w
 export interface IEditorContentFactory extends NotebookPanel.IContentFactory {}
 
 export class EditorWidget extends Widget {
-    constructor(commands: CommandRegistry) {
+    constructor() {
         super();
     }
 
-    render_side_button(active_cell: Cell, active_notebook: NotebookPanel) {
-        const sidebar = this.sidebar(active_cell.node);
-        const run_button = this.run_button(active_cell, active_notebook);
+    static _singleton: EditorWidget;
+    private _tracker: INotebookTracker;
+    private _previous_cell: Cell;
+
+    static instance() {
+        // Instantiate if necessary
+        if (!EditorWidget._singleton) EditorWidget._singleton = new EditorWidget();
+        return EditorWidget._singleton;
+    }
+
+    get tracker(): INotebookTracker {
+        return this._tracker;
+    }
+
+    set tracker(tracker: INotebookTracker) {
+        this._tracker = tracker;
+    }
+
+    get previous_cell(): Cell {
+        return this._previous_cell;
+    }
+
+    set previous_cell(_previous_cell: Cell) {
+        this._previous_cell = _previous_cell;
+    }
+
+    no_side_button(): boolean {
+        return !this.sidebar(this._tracker.activeCell.node)?.querySelector('.jp-RenderButton');
+    }
+
+    render_side_button() {
+        const sidebar = this.sidebar(this._tracker.activeCell.node);
+        const run_button = this.run_button(this._tracker.activeCell, this._tracker.currentWidget);
         sidebar.append(run_button);
     }
 
-    remove_side_button(previous_cell: Cell) {
-        if (!previous_cell) return; // If there is no previous cell, do nothing
-        const sidebar = this.sidebar(previous_cell.node);
-        sidebar.querySelector(".jp-RenderButton")?.remove();
+    remove_side_button() {
+        if (this._previous_cell) {
+            const sidebar = this.sidebar(this._previous_cell.node);
+            sidebar.querySelector(".jp-RenderButton")?.remove();
+        }
+        this._previous_cell = this._tracker.activeCell;
     }
 
     sidebar(node: HTMLElement) {
