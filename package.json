@@ -11,7 +11,6 @@
   "files": [
     "lib/**/*.{js,css}",
     "style/*.{js,css,png,svg}",
-    "schema/**/*.json",
     "dist/*.{js,css}",
     "style/index.js"
   ],
@@ -94,7 +93,6 @@
   },
   "jupyterlab": {
     "extension": "lib/plugin",
-    "schemaDir": "schema",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,
