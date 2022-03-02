@@ -1,5 +1,5 @@
 import { CodeEditor } from "@jupyterlab/codeeditor";
-import {IMarkdownCellModel, MarkdownCell} from "@jupyterlab/cells";
+import { IMarkdownCellModel, MarkdownCell } from "@jupyterlab/cells";
 import { UUID } from "@lumino/coreutils";
 import { Signal } from "@lumino/signaling";
 import { IDisposable, DisposableDelegate } from "@lumino/disposable";
@@ -84,7 +84,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
         Signal.clearData(this);
     }
 
-    // Called when a markdown cell is either first endered or toggled into editor mode
+    // Called when a markdown cell is either first rendered or toggled into editor mode
     refresh(): void {
         const active_cell = EditorWidget.instance().tracker.activeCell;
         if (active_cell instanceof MarkdownCell && !active_cell.rendered && EditorWidget.instance().no_side_button()) {
@@ -139,11 +139,15 @@ export class TinyMCEView {
     constructor(host: HTMLElement, model: CodeEditor.IModel) {
         // Create the wrapper for TinyMCE
         const wrapper = document.createElement("div");
-        wrapper.innerHTML = model.value.text;
         host.appendChild(wrapper);
 
         // Wait for cell initialization before initializing editor
         setTimeout(() => {
+            // Special case to remove anchor links before loading
+            const render_node = host?.parentElement?.querySelector('.jp-MarkdownOutput');
+            if (render_node) render_node.querySelectorAll('.jp-InternalAnchorLink').forEach(e => e.remove());
+            wrapper.innerHTML = render_node?.innerHTML || model.value.text;
+
             try {
                 TinyMCE.init({
                     target: wrapper,
