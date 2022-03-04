@@ -1,6 +1,8 @@
 # WYSIWYG HTML/Markdown Editor for Jupyter Notebook
 
-This is an nbextension that enables WYSIWYG editing functionality for HTML/Markdown cells in Jupyter.
+This is an nbextension/labextension that enables WYSIWYG editing functionality for HTML/Markdown cells in Jupyter.
+
+> The extension for Jupyter Notebook can be found in the master branch. The JupyterLab version is found in the lab branch.
 
 ## Installing
 
@@ -8,7 +10,7 @@ This extension can be installed through either PIP or conda.
 
 > pip install jupyter-wysiwyg
 
-> conda install -c genepattern jupyter-wysiwyg
+> conda install -c g2nb jupyter-wysiwyg
 
 ## Enabling
 
