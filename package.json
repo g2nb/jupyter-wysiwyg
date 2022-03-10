@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@jupyterlab/apputils": "3.2.9",
-    "@jupyterlab/builder": "3.2.9",
+    "@jupyterlab/builder": "^3.3.0",
     "@jupyterlab/codeeditor": "3.2.9",
     "@jupyterlab/ui-components": "3.2.9",
     "@lumino/application": "1.28.1",
