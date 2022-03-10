@@ -57,9 +57,9 @@
   },
   "dependencies": {
     "@jupyter-widgets/base": "^4.0.0",
-    "@jupyterlab/application": "3.2.9",
-    "@jupyterlab/mainmenu": "3.2.9",
-    "@jupyterlab/notebook": "3.2.9",
+    "@jupyterlab/application": "^3.3.0",
+    "@jupyterlab/mainmenu": "^3.3.0",
+    "@jupyterlab/notebook": "^3.3.0",
     "tinymce": "^5.9.2"
   },
   "devDependencies": {
