@@ -9,14 +9,14 @@ import "../style/index.css";
  * The jupyter-wysiwyg plugins
  */
 const wysiwyg_plugin: JupyterFrontEndPlugin<void> = {
-    id: "@genepattern/jupyter-wysiwyg:plugin",
+    id: "@g2nb/jupyter-wysiwyg:plugin",
     requires: [INotebookTracker, IStateDB],
     activate: activate_editor,
     autoStart: true
 };
 
 const add_wysiwyg: JupyterFrontEndPlugin<IEditorContentFactory> = {
-    id: "@genepattern/jupyter-wysiwyg:add-wysiwyg",
+    id: "@g2nb/jupyter-wysiwyg:add-wysiwyg",
     provides: NotebookPanel.IContentFactory,
     activate: override_editor,
     autoStart: true

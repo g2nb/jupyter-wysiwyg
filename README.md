@@ -19,7 +19,7 @@ pip install jupyter-wysiwyg
 
 ```bash
 # Clone the jupyter-wysiwyg repository
-git clone https://github.com/genepattern/jupyter-wysiwyg.git
+git clone https://github.com/g2nb/jupyter-wysiwyg.git
 cd jupyter-wysiwyg 
 
 # Install the jupyter-wysiwyg JupyterLab prototype

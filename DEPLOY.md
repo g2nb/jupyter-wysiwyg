@@ -56,5 +56,5 @@
 built version using a separate upload command.
 > conda convert --platform all /anaconda3/conda-bld/osx-64/jupyter-wysiwyg-XXX-py37_0.tar.bz2 -o conda-bld/
 7. Upload the newly built package:
-> anaconda upload /anaconda3/conda-bld/*/jupyter-wysiwyg-XXX-py37_0.tar.bz2 -u genepattern
+> anaconda upload /anaconda3/conda-bld/*/jupyter-wysiwyg-XXX-py37_0.tar.bz2 -u g2nb
 8. Log into the [Anaconda website](https://anaconda.org/) to make sure everything is good.

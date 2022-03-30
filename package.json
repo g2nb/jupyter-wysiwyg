@@ -1,5 +1,5 @@
 {
-  "name": "@genepattern/jupyter-wysiwyg",
+  "name": "@g2nb/jupyter-wysiwyg",
   "version": "21.9.0-beta.1",
   "description": "WYSIWYG editing functionality for markdown/HTML cells in Jupyter",
   "keywords": [
@@ -14,9 +14,9 @@
     "dist/*.{js,css}",
     "style/index.js"
   ],
-  "homepage": "https://github.com/genepattern/jupyter-wysiwyg",
+  "homepage": "https://github.com/g2nb/jupyter-wysiwyg",
   "bugs": {
-    "url": "https://github.com/genepattern/jupyter-wysiwyg/issues"
+    "url": "https://github.com/g2nb/jupyter-wysiwyg/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -28,7 +28,7 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/genepattern/jupyter-wysiwyg"
+    "url": "https://github.com/g2nb/jupyter-wysiwyg"
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",

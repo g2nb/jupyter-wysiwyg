@@ -30,10 +30,10 @@ module.exports = [
     output: {
       filename: 'embed-bundle.js',
       path: path.resolve(__dirname, 'docs', 'source', '_static'),
-      library: "@genepattern/jupyter-wysiwyg",
+      library: "@g2nb/jupyter-wysiwyg",
       libraryTarget: 'amd',
       // TODO: Replace after release to unpkg.org
-      publicPath: '' // 'https://unpkg.com/@genepattern/jupyter-wysiwyg@' + version + '/dist/'
+      publicPath: '' // 'https://unpkg.com/@g2nb/jupyter-wysiwyg@' + version + '/dist/'
     },
     module: {
       rules: rules

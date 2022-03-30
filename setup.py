@@ -22,7 +22,7 @@ package_data_spec = {
     name: ["*"],
 }
 
-labext_name = "@genepattern/jupyter-wysiwyg"
+labext_name = "@g2nb/jupyter-wysiwyg"
 
 data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, str(lab_path), "**"),
