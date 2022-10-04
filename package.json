@@ -1,6 +1,6 @@
 {
   "name": "@g2nb/jupyter-wysiwyg",
-  "version": "21.9.0-beta.1",
+  "version": "22.10.0-beta.1",
   "description": "WYSIWYG editing functionality for markdown/HTML cells in Jupyter",
   "keywords": [
     "jupyter",

@@ -160,6 +160,7 @@ export class TinyMCEView {
                     menubar: false,
                     height: 500,
                     resize: false,
+                    plugins: 'emoticons lists',
                     toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons | bullist numlist outdent indent blockquote',
                     init_instance_callback: (editor: any) => editor.on('Change', () => model.value.text = editor.getContent())
                 }).then(editor => {
