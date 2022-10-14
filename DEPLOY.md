@@ -58,3 +58,13 @@ built version using a separate upload command.
 7. Upload the newly built package:
 > anaconda upload /anaconda3/conda-bld/*/jupyter-wysiwyg-XXX-py37_0.tar.bz2 -u g2nb
 8. Log into the [Anaconda website](https://anaconda.org/) to make sure everything is good.
+
+# How to deploy to NPM
+
+1. Make sure that the version number is updated in `package.json`.
+2. Navigate to the directory where the repository was checked out:
+> cd jupyter-wysiwyg
+3. Log in to NPM is necessary
+> npm login
+4. Build and upload the package. Be prepared to enter a two-factor authentication code when prompted.
+> npm publish
