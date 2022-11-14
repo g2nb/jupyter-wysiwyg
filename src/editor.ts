@@ -158,7 +158,7 @@ export class TinyMCEView {
                     contextmenu: false,
                     elementpath: false,
                     menubar: false,
-                    height: 500,
+                    height: 300,
                     resize: false,
                     plugins: 'emoticons lists link code',
                     toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | link forecolor backcolor emoticons | bullist numlist outdent indent blockquote | code',
