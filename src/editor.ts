@@ -102,6 +102,11 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
         }();
     }
 
+    // This is a dummy implementation that prevents an error in the console
+    getCursor(): CodeEditor.IPosition {
+        return this.getCursorPosition();
+    }
+
     // Empty stubs necessary to implement CodeEditor.IEditor, full integration may require implementing these methods
     clearHistory(): void {}
     scroll(): void {}
