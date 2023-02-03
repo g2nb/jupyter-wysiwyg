@@ -60,6 +60,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     get model() { return this._model; }
     get lineCount() { return TinyMCEEditor.DEFAULT_NUMBER; }
     get selectionStyle() { return this._selection_style; }
+    get doc() { return new DummyDoc(); }
 
     // Setters
     set uuid(value) { this._uuid = value; }
@@ -122,17 +123,37 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     getTokens(): CodeEditor.IToken[] { return []; }
     hasFocus(): boolean { return false; }
     newIndentedLine(): void {}
+    operation(func: Function): void {}
     redo(): void {}
+    removeOverlay(overlay: any): void {}
     resizeToFit(): void {}
     revealPosition(position: CodeEditor.IPosition): void {}
     revealSelection(selection: CodeEditor.IRange): void {}
     setCursorPosition(position: CodeEditor.IPosition): void {}
     setOption<K extends keyof CodeEditor.IConfig>(option: K, value: CodeEditor.IConfig[K]): void {}
-    setOptions<K extends keyof CodeEditor.IConfig>(options: CodeEditor.IConfigOptions<K>[]): void {}
+    setOptions(options: Partial<CodeEditor.IConfig>): void {}
     setSelection(selection: CodeEditor.IRange): void {}
     setSelections(selections: CodeEditor.IRange[]): void {}
     setSize(size: CodeEditor.IDimension | null): void {}
     undo(): void {}
+    firstLine() { return ''; }
+    lastLine() { return ''; }
+}
+
+/**
+ * Dummy implementation prevents errors in search functionality
+ */
+class DummyDoc {
+    sliceString(from: any, to: any) { return ''; }
+    toString() { return ''; }
+    get length() { return 0; }
+    lineAt(index: any) { return ''; }
+    line(index: any) { return ''; }
+    firstLine() { return ''; }
+    lastLine() { return ''; }
+    getSelection() { return ''; }
+    getRange(start: any, end: any) { return ''; }
+    removeOverlay(overlay: any): void {}
 }
 
 export namespace TinyMCEEditor {

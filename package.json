@@ -1,6 +1,6 @@
 {
   "name": "@g2nb/jupyter-wysiwyg",
-  "version": "22.12.0-beta.1",
+  "version": "23.2.0",
   "description": "WYSIWYG editing functionality for markdown/HTML cells in Jupyter",
   "keywords": [
     "jupyter",
@@ -57,18 +57,18 @@
   },
   "dependencies": {
     "@jupyter-widgets/base": "^4.0.0",
-    "@jupyterlab/application": "^3.3.0",
-    "@jupyterlab/mainmenu": "^3.3.0",
-    "@jupyterlab/notebook": "^3.3.0",
+    "@jupyterlab/application": "^3.5.3",
+    "@jupyterlab/mainmenu": "^3.5.3",
+    "@jupyterlab/notebook": "^3.5.3",
     "tinymce": "^5.9.2"
   },
   "devDependencies": {
-    "@jupyterlab/apputils": "3.2.9",
-    "@jupyterlab/builder": "^3.3.0",
-    "@jupyterlab/codeeditor": "3.2.9",
-    "@jupyterlab/ui-components": "3.2.9",
-    "@lumino/application": "1.28.1",
-    "@lumino/widgets": "1.31.1",
+    "@jupyterlab/apputils": "^3.5.3",
+    "@jupyterlab/builder": "^3.5.3",
+    "@jupyterlab/codeeditor": "3.5.3",
+    "@jupyterlab/ui-components": "^3.5.3",
+    "@lumino/application": "^1.31.3",
+    "@lumino/widgets": "^1.37.1",
     "@types/backbone": "^1.4.4",
     "@types/node": "^14.14.27",
     "@typescript-eslint/eslint-plugin": "^4.8.1",

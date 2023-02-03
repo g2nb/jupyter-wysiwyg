@@ -23,7 +23,7 @@ export class EditorContentFactory extends NotebookPanel.ContentFactory implement
             editorFactory: (options: CodeEditor.IOptions) => {
                 return new TinyMCEEditor(options, model);
             }
-        } as Cell.ContentFactory.IOptions);
+        } as any);
 
         return new MarkdownCell(options).initializeState();
       }
