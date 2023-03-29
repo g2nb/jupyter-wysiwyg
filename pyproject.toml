@@ -31,7 +31,7 @@ classifiers = [
 dependencies = [
     "jupyterlab>=3.4",
 ]
-version = "23.2.0"
+version = "23.03.0"
 
 [project.license]
 file = "LICENSE.txt"
@@ -85,7 +85,7 @@ npm = [
 github_url = "https://github.com/g2nb/jupyter-wysiwyg"
 
 [tool.tbump.version]
-current = "23.2.0"
+current = "23.03.0"
 regex = '''
   (?P<major>\d+)
   \.
