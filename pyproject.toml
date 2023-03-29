@@ -107,8 +107,5 @@ src = "pyproject.toml"
 version_template = "version = \"{major}.{minor}.{patch}\""
 
 [[tool.tbump.file]]
-src = "jupyter-wysiwyg/_version.py"
-
-[[tool.tbump.file]]
 src = "package.json"
 version_template = "\"version\": \"{major}.{minor}.{patch}\""
