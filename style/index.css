@@ -6,10 +6,21 @@
     margin-bottom: 0;
 }
 
+button.jp-side-button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+}
+
 .jp-RenderButton {
     cursor: pointer;
 }
 
 .jp-RenderButton:hover {
     background-color: var(--jp-layout-color2);
+}
+
+.jp-TinyMCE > .CodeMirror {
+    min-height: 60px;
 }

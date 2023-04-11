@@ -23,7 +23,9 @@ import 'tinymce/plugins/table';
 // import contentCss from 'tinymce/skins/content/default/content.css';
 
 export class TinyMCEEditor implements CodeEditor.IEditor {
-    constructor(options: TinyMCEEditor.IOptions, markdownModel: IMarkdownCellModel) {
+    constructor(options: TinyMCEEditor.IOptions, markdownModel: IMarkdownCellModel, defaultEditor: any) {
+        this.defaultEditor = defaultEditor;
+
         this.host = options.host;
         this.host.classList.add("jp-RenderedHTMLCommon");
         this.host.classList.add('jp-TinyMCE');
@@ -36,6 +38,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
         this._model = options.model;
         this.is_markdown = (markdownModel.metadata.get("markdownMode") as boolean);
         if (!!this.is_markdown) this.is_markdown = false;
+        (window as any).defaultEditor = this.defaultEditor;
         this._view = new TinyMCEView(this.host, this.model);
     }
 
@@ -52,6 +55,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     readonly host: HTMLElement;
     readonly isDisposed: boolean;
     readonly lineHeight: number;
+    public defaultEditor: any;
 
     // Getters
     get view() { return this._view; }
@@ -169,10 +173,7 @@ export class TinyMCEView {
 
         // Wait for cell initialization before initializing editor
         setTimeout(() => {
-            // Special case to remove anchor links before loading
-            const render_node = host?.parentElement?.querySelector('.jp-MarkdownOutput');
-            if (render_node) render_node.querySelectorAll('.jp-InternalAnchorLink').forEach(e => e.remove());
-            wrapper.innerHTML = render_node?.innerHTML || model.value.text;
+            wrapper.innerHTML = this._getRenderText(host, model);
 
             try {
                 TinyMCE.init({
@@ -186,9 +187,18 @@ export class TinyMCEView {
                     menubar: false,
                     height: 300,
                     resize: false,
+                    // setup: editor => {
+                    //     editor.on('init', e => {
+                    //         e.target.hide();
+                    //         (host.querySelector('[aria-hidden="true"]') as HTMLElement).style.display = 'none';
+                    //     });
+                    // },
                     plugins: 'emoticons lists link code',
                     toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | link forecolor backcolor emoticons | bullist numlist outdent indent blockquote | code',
-                    init_instance_callback: (editor: any) => editor.on('Change', () => model.value.text = editor.getContent())
+                    init_instance_callback: (editor: any) => {
+                        editor.on('change', () => model.value.text = editor.getContent());
+                        editor.on('keyup', () => model.value.text = editor.getContent());
+                    }
                 }).then(editor => {
                     if (!editor.length) return; // If no valid editors, do nothing
                     editor[0].on("focus", () => {
@@ -196,12 +206,33 @@ export class TinyMCEView {
                         if (index !== null)
                             EditorWidget.instance().tracker.currentWidget.content.activeCellIndex = index;
                     });
+
+                    // Hide TinyMCE by default
+                    setTimeout(() => {
+                        (host.querySelector('.tox-tinymce') as HTMLElement).style.display = 'none';
+                    }, 200);
+
+                    // Sync model if necessary
+                    setInterval(() => {
+                        if (model.value.text !== editor[0].getContent() &&
+                            (host.querySelector('.tox-tinymce') as HTMLElement).style.display === 'none')
+                            editor[0].setContent(this._getRenderText(host, model));
+                    }, 1000);
+
+                    return editor;
                 });
             }
             catch (e) {
                 console.log("TinyMCE threw an error: " + e);
             }
         }, 500);
+    }
+
+    _getRenderText(host:HTMLElement, model: CodeEditor.IModel) {
+        // Special case to remove anchor links before loading
+        const render_node = host?.parentElement?.querySelector('.jp-MarkdownOutput');
+        if (render_node) render_node.querySelectorAll('.jp-InternalAnchorLink').forEach(e => e.remove());
+        return render_node?.innerHTML || model.value.text;
     }
 
     blur() {}
