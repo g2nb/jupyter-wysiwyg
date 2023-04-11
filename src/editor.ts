@@ -4,7 +4,6 @@ import { UUID } from "@lumino/coreutils";
 import { Signal } from "@lumino/signaling";
 import { IDisposable, DisposableDelegate } from "@lumino/disposable";
 import { ArrayExt } from '@lumino/algorithm';
-import { JSONValue } from "@lumino/coreutils/src/json";
 import { EditorWidget } from "./factory";
 
 // Import TinyMCE
@@ -38,7 +37,6 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
         this._model = options.model;
         this.is_markdown = (markdownModel.metadata.get("markdownMode") as boolean);
         if (!!this.is_markdown) this.is_markdown = false;
-        (window as any).defaultEditor = this.defaultEditor;
         this._view = new TinyMCEView(this.host, this.model);
     }
 
@@ -70,8 +68,8 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     set uuid(value) { this._uuid = value; }
     set selectionStyle(value) { this._selection_style = value; }
 
-    blur(): void { if (this._view) this._view.blur(); }
-    focus(): void { if (this._view) this._view.focus(); }
+    blur(): void { if (this._view) this.defaultEditor.blur(); }
+    focus(): void { if (this._view) this.defaultEditor.focus(); }
 
     addKeydownHandler(handler: (instance: CodeEditor.IEditor, event: KeyboardEvent) => boolean): IDisposable {
         this._keydownHandlers.push(handler);
@@ -91,6 +89,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
 
     // Called when a markdown cell is either first rendered or toggled into editor mode
     refresh(): void {
+        this.defaultEditor.refresh();
         const active_cell = EditorWidget.instance().tracker.activeCell;
         if (active_cell instanceof MarkdownCell && !active_cell.rendered && EditorWidget.instance().no_side_button()) {
             active_cell.editor.focus();
@@ -100,11 +99,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
 
     // This is a dummy implementation that prevents an error in the console
     getCursorPosition(): CodeEditor.IPosition {
-        return new class implements CodeEditor.IPosition {
-            [key: string]: JSONValue;
-            line: 0;
-            column: 0;
-        }();
+        return this.defaultEditor.getCursorPosition();
     }
 
     // This is a dummy implementation that prevents an error in the console
@@ -113,35 +108,35 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     }
 
     // Empty stubs necessary to implement CodeEditor.IEditor, full integration may require implementing these methods
-    clearHistory(): void {}
-    scroll(): void {}
-    getCoordinateForPosition(position: CodeEditor.IPosition): CodeEditor.ICoordinate { return undefined; }
-    getLine(line: number): string | undefined { return undefined; }
-    getOffsetAt(position: CodeEditor.IPosition): number { return 0; }
-    getOption<K extends keyof CodeEditor.IConfig>(option: K): CodeEditor.IConfig[K] { return undefined; }
-    getPositionAt(offset: number): CodeEditor.IPosition | undefined { return undefined; }
+    clearHistory(): void { this.defaultEditor.clearHistory(); }
+    scroll(): void { this.defaultEditor.scroll(); }
+    getCoordinateForPosition(position: CodeEditor.IPosition): CodeEditor.ICoordinate { return this.defaultEditor.getCoordinateForPosition(position); }
+    getLine(line: number): string | undefined { return this.defaultEditor.getLine(line); }
+    getOffsetAt(position: CodeEditor.IPosition): number { return this.defaultEditor.getOffsetAt(position); }
+    getOption<K extends keyof CodeEditor.IConfig>(option: K): CodeEditor.IConfig[K] { return this.defaultEditor.getOption(option); }
+    getPositionAt(offset: number): CodeEditor.IPosition | undefined { return this.defaultEditor.getPositionAt(offset); }
     getPositionForCoordinate(coordinate: CodeEditor.ICoordinate): CodeEditor.IPosition | null { return undefined; }
-    getSelection(): CodeEditor.IRange { return undefined; }
-    getSelections(): CodeEditor.IRange[] { return []; }
-    getTokenForPosition(position: CodeEditor.IPosition): CodeEditor.IToken { return undefined; }
+    getSelection(): CodeEditor.IRange { return this.defaultEditor.getSelection(); }
+    getSelections(): CodeEditor.IRange[] { return this.defaultEditor.getSelections(); }
+    getTokenForPosition(position: CodeEditor.IPosition): CodeEditor.IToken { return this.defaultEditor.getTokenForPosition(position); }
     getTokens(): CodeEditor.IToken[] { return []; }
-    hasFocus(): boolean { return false; }
+    hasFocus(): boolean { return this.defaultEditor.hasFocus(); }
     newIndentedLine(): void {}
     operation(func: Function): void {}
-    redo(): void {}
+    redo(): void { this.defaultEditor.redo(); }
     removeOverlay(overlay: any): void {}
-    resizeToFit(): void {}
+    resizeToFit(): void { this.defaultEditor.resizeToFit(); }
     revealPosition(position: CodeEditor.IPosition): void {}
     revealSelection(selection: CodeEditor.IRange): void {}
     setCursorPosition(position: CodeEditor.IPosition): void {}
     setOption<K extends keyof CodeEditor.IConfig>(option: K, value: CodeEditor.IConfig[K]): void {}
-    setOptions(options: Partial<CodeEditor.IConfig>): void {}
-    setSelection(selection: CodeEditor.IRange): void {}
-    setSelections(selections: CodeEditor.IRange[]): void {}
-    setSize(size: CodeEditor.IDimension | null): void {}
-    undo(): void {}
-    firstLine() { return ''; }
-    lastLine() { return ''; }
+    setOptions(options: Partial<CodeEditor.IConfig>): void { this.defaultEditor.setOptions(options); }
+    setSelection(selection: CodeEditor.IRange): void { this.defaultEditor.setSelection(selection); }
+    setSelections(selections: CodeEditor.IRange[]): void { this.defaultEditor.setSelections(selections); }
+    setSize(size: CodeEditor.IDimension | null): void { this.defaultEditor.setSize(size); }
+    undo(): void { this.defaultEditor.undo(); }
+    firstLine() { return this.defaultEditor.firstLine(); }
+    lastLine() { return this.defaultEditor.lastLine(); }
 }
 
 /**
@@ -187,17 +182,13 @@ export class TinyMCEView {
                     menubar: false,
                     height: 300,
                     resize: false,
-                    // setup: editor => {
-                    //     editor.on('init', e => {
-                    //         e.target.hide();
-                    //         (host.querySelector('[aria-hidden="true"]') as HTMLElement).style.display = 'none';
-                    //     });
-                    // },
                     plugins: 'emoticons lists link code',
                     toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | link forecolor backcolor emoticons | bullist numlist outdent indent blockquote | code',
                     init_instance_callback: (editor: any) => {
                         editor.on('change', () => model.value.text = editor.getContent());
-                        editor.on('keyup', () => model.value.text = editor.getContent());
+                        editor.on('keyup', () => {
+                            model.value.text = editor.getContent();
+                        });
                     }
                 }).then(editor => {
                     if (!editor.length) return; // If no valid editors, do nothing
@@ -215,8 +206,9 @@ export class TinyMCEView {
                     // Sync model if necessary
                     setInterval(() => {
                         if (model.value.text !== editor[0].getContent() &&
-                            (host.querySelector('.tox-tinymce') as HTMLElement).style.display === 'none')
+                            (host.querySelector('.tox-tinymce') as HTMLElement).style.display === 'none') {
                             editor[0].setContent(this._getRenderText(host, model));
+                        }
                     }, 1000);
 
                     return editor;

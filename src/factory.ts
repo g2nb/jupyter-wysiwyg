@@ -114,10 +114,12 @@ export class EditorWidget extends Widget {
             if (code_mirror.style.display === 'none') {
                 code_mirror.style.display = 'block';
                 tiny_mce.style.display = 'none';
+                cell.editor.refresh();
             }
             else {
                 code_mirror.style.display = 'none';
                 tiny_mce.style.display = 'flex';
+                cell.editor.refresh();
             }
         });
         return button;
