@@ -109,6 +109,11 @@ export class EditorWidget extends Widget {
         button.setAttribute("title", "Toggle the Rich Text Editor");
         button.innerHTML = fileIcon.svgstr;
         button.addEventListener("click", () => {
+            console.log('------------------------------------');
+            console.log(cell.editor);
+            (cell.editor as any).syncFromCodeMirror();
+            console.log('------------------------------------');
+
             const tiny_mce = cell.node.querySelector('.tox-tinymce') as HTMLElement;
             const code_mirror = cell.node.querySelector('.CodeMirror') as HTMLElement;
             if (code_mirror.style.display === 'none') {

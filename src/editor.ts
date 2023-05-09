@@ -71,6 +71,13 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     blur(): void { if (this._view) this.defaultEditor.blur(); }
     focus(): void { if (this._view) this.defaultEditor.focus(); }
 
+    syncFromCodeMirror() {
+        if (this.model.value.text !== this._view.tinymce.getContent() &&
+            (this.host.querySelector('.tox-tinymce') as HTMLElement).style.display === 'none') {
+            this._view.tinymce.setContent(this._view._getRenderText(this.host, this.model));
+        }
+    }
+
     addKeydownHandler(handler: (instance: CodeEditor.IEditor, event: KeyboardEvent) => boolean): IDisposable {
         this._keydownHandlers.push(handler);
         return new DisposableDelegate(() => {
@@ -161,6 +168,8 @@ export namespace TinyMCEEditor {
 }
 
 export class TinyMCEView {
+    public tinymce:any = null;
+
     constructor(host: HTMLElement, model: CodeEditor.IModel) {
         // Create the wrapper for TinyMCE
         const wrapper = document.createElement("div");
@@ -203,13 +212,8 @@ export class TinyMCEView {
                         (host.querySelector('.tox-tinymce') as HTMLElement).style.display = 'none';
                     }, 200);
 
-                    // Sync model if necessary
-                    setInterval(() => {
-                        if (model.value.text !== editor[0].getContent() &&
-                            (host.querySelector('.tox-tinymce') as HTMLElement).style.display === 'none') {
-                            editor[0].setContent(this._getRenderText(host, model));
-                        }
-                    }, 1000);
+                    // Set the TinyMCE instance
+                    this.tinymce = editor[0];
 
                     return editor;
                 });
