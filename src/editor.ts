@@ -194,7 +194,7 @@ export class TinyMCEView {
                     plugins: 'emoticons lists link code',
                     toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | link forecolor backcolor emoticons | bullist numlist outdent indent blockquote | code',
                     init_instance_callback: (editor: any) => {
-                        editor.on('change', () => model.value.text = editor.getContent());
+                        // editor.on('change', () => model.value.text = editor.getContent());
                         editor.on('keyup', () => {
                             model.value.text = editor.getContent();
                         });
