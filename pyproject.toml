@@ -1,85 +1,92 @@
 [build-system]
-requires = [
-    "hatchling",
-    "jupyterlab>=3.4,<4",
-]
+requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0.3.2"]
 build-backend = "hatchling.build"
 
 [project]
 name = "jupyter-wysiwyg"
 description = "WYSIWYG editing functionality for markdown/HTML cells in Jupyter"
 readme = "README.md"
-requires-python = ">=3.6"
+license = { file = "LICENSE.txt" }
+requires-python = ">=3.8"
 authors = [
     { name = "Thorin Tabor", email = "tmtabor@cloud.ucsd.edu" },
 ]
 keywords = [
     "Jupyter",
     "JupyterLab",
-    "JupyterLab3",
+    "JupyterLab4",
 ]
 classifiers = [
     "Framework :: Jupyter",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
     "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 dependencies = [
-    "jupyterlab>=3.4,<4",
 ]
 version = "23.03.0"
-
-[project.license]
-file = "LICENSE.txt"
 
 [project.urls]
 Homepage = "https://github.com/g2nb/jupyter-wysiwyg"
 
-[tool.hatch.build]
-artifacts = [
-    "jupyter-wysiwyg/labextension",
-]
+[tool.hatch.version]
+source = "nodejs"
 
-[tool.hatch.build.targets.wheel.shared-data]
-"jupyter-wysiwyg/labextension/static" = "share/jupyter/labextensions/@g2nb/jupyter-wysiwyg/static"
-"install.json" = "share/jupyter/labextensions/@g2nb/jupyter-wysiwyg/install.json"
-"jupyter-wysiwyg/labextension/package.json" = "share/jupyter/labextensions/@g2nb/jupyter-wysiwyg/package.json"
+[tool.hatch.metadata.hooks.nodejs]
+fields = ["description", "authors", "urls"]
 
 [tool.hatch.build.targets.sdist]
-exclude = [
-    ".github",
-]
+artifacts = ["jupyter-wysiwyg/labextension"]
+exclude = [".github", "binder"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jupyter-wysiwyg/labextension" = "share/jupyter/labextensions/@g2nb/jupyter-wysiwyg"
+"install.json" = "share/jupyter/labextensions/@g2nb/jupyter-wysiwyg/install.json"
+
+[tool.hatch.build.hooks.version]
+path = "jupyter-wysiwyg/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
-dependencies = [
-    "hatch-jupyter-builder>=0.8.2",
-]
+dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
     "jupyter-wysiwyg/labextension/static/style.js",
     "jupyter-wysiwyg/labextension/package.json",
 ]
-skip-if-exists = [
-    "jupyter-wysiwyg/labextension/static/style.js",
-]
-
-[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-build_dir = "jupyter-wysiwyg/labextension"
-source_dir = "src"
-build_cmd = "install:extension"
-npm = [
-    "jlpm",
-]
+skip-if-exists = ["jupyter-wysiwyg/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-build_cmd = "build:all"
-npm = [
+build_cmd = "build:prod"
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+build_cmd = "install:extension"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "jupyter-wysiwyg/labextension"
+
+[tool.jupyter-releaser.options]
+version_cmd = "hatch version"
+
+[tool.jupyter-releaser.hooks]
+before-build-npm = [
+    "python -m pip install 'jupyterlab>=4.0.0,<5'",
     "jlpm",
+    "jlpm build:prod"
 ]
+before-build-python = ["jlpm clean:all"]
+
+[tool.check-wheel-contents]
+ignore = ["W002"]
 
 [tool.tbump]
 github_url = "https://github.com/g2nb/jupyter-wysiwyg"

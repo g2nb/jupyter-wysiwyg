@@ -21,6 +21,10 @@ button.jp-side-button {
     background-color: var(--jp-layout-color2);
 }
 
-.jp-TinyMCE > .CodeMirror {
+.jp-TinyMCE > .cm-editor {
     min-height: 60px;
+}
+
+.jw-Hidden {
+    display: none !important;
 }

@@ -18,8 +18,6 @@ import 'tinymce/plugins/emoticons/js/emojis';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/lists';
 import 'tinymce/plugins/table';
-// import contentUiCss from 'tinymce/skins/ui/oxide/content.css'; // Import content CSS
-// import contentCss from 'tinymce/skins/content/default/content.css';
 
 export class TinyMCEEditor implements CodeEditor.IEditor {
     constructor(options: TinyMCEEditor.IOptions, markdownModel: IMarkdownCellModel, defaultEditor: any) {
@@ -35,9 +33,20 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
         this._uuid = options.uuid || UUID.uuid4();
 
         this._model = options.model;
-        this.is_markdown = (markdownModel.metadata.get("markdownMode") as boolean);
+        this.is_markdown = (markdownModel.getMetadata("markdownMode") as boolean);
         if (!!this.is_markdown) this.is_markdown = false;
         this._view = new TinyMCEView(this.host, this.model);
+
+        this.model.sharedModel.changed.connect(() => {
+            if (!(this.host.querySelector('.tox-tinymce') as HTMLElement).classList.contains('jw-Hidden'))
+                this.defaultEditor._editor.dispatch({
+                  changes: { from: 0, to: this.defaultEditor._editor.state.doc.length, insert: this._view.tinymce.getContent() }
+                });
+        });
+
+        this.defaultEditor._editor.dom.addEventListener('input', (e: any) => {
+            this.model.sharedModel.setSource(this.defaultEditor._editor.state.doc.toString());
+        });
     }
 
     static DEFAULT_NUMBER: number = 0;
@@ -45,7 +54,6 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     private _uuid = '';
     private _is_disposed = false;
     private _keydownHandlers = new Array<CodeEditor.KeydownHandler>();
-    private _selection_style: CodeEditor.ISelectionStyle;
     private _view: TinyMCEView;
     public is_markdown = false;
     readonly charWidth: number;
@@ -61,20 +69,23 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     get is_disposed() { return this._is_disposed; }
     get model() { return this._model; }
     get lineCount() { return TinyMCEEditor.DEFAULT_NUMBER; }
-    get selectionStyle() { return this._selection_style; }
     get doc() { return new DummyDoc(); }
 
     // Setters
     set uuid(value) { this._uuid = value; }
-    set selectionStyle(value) { this._selection_style = value; }
 
     blur(): void { if (this._view) this.defaultEditor.blur(); }
     focus(): void { if (this._view) this.defaultEditor.focus(); }
 
+    injectExtension(ext: any) { return this.defaultEditor.injectExtension(ext); }
+    getTokenAt(offset: number): CodeEditor.IToken { return this.defaultEditor.getTokenAt(offset); }
+    getTokenAtCursor(): CodeEditor.IToken { return this.defaultEditor.getTokenAtCursor(); }
+
     syncFromCodeMirror() {
-        if (this.model.value.text !== this._view.tinymce.getContent() &&
-            (this.host.querySelector('.tox-tinymce') as HTMLElement).style.display === 'none') {
-            this._view.tinymce.setContent(this._view._getRenderText(this.host, this.model));
+        if (this.defaultEditor._editor.state.doc.toString() !== this._view.tinymce.getContent() &&
+            (this.host.querySelector('.tox-tinymce') as HTMLElement).classList.contains('jw-Hidden')) {
+            this._view.tinymce.setContent(this.defaultEditor._editor.state.doc.toString());
+            this.model.sharedModel.setSource(this.defaultEditor._editor.state.doc.toString());
         }
     }
 
@@ -96,7 +107,6 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
 
     // Called when a markdown cell is either first rendered or toggled into editor mode
     refresh(): void {
-        this.defaultEditor.refresh();
         const active_cell = EditorWidget.instance().tracker.activeCell;
         if (active_cell instanceof MarkdownCell && !active_cell.rendered && EditorWidget.instance().no_side_button()) {
             active_cell.editor.focus();
@@ -120,7 +130,7 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     getCoordinateForPosition(position: CodeEditor.IPosition): CodeEditor.ICoordinate { return this.defaultEditor.getCoordinateForPosition(position); }
     getLine(line: number): string | undefined { return this.defaultEditor.getLine(line); }
     getOffsetAt(position: CodeEditor.IPosition): number { return this.defaultEditor.getOffsetAt(position); }
-    getOption<K extends keyof CodeEditor.IConfig>(option: K): CodeEditor.IConfig[K] { return this.defaultEditor.getOption(option); }
+    getOption(option: string): any { return this.defaultEditor.getOption(option); }
     getPositionAt(offset: number): CodeEditor.IPosition | undefined { return this.defaultEditor.getPositionAt(offset); }
     getPositionForCoordinate(coordinate: CodeEditor.ICoordinate): CodeEditor.IPosition | null { return undefined; }
     getSelection(): CodeEditor.IRange { return this.defaultEditor.getSelection(); }
@@ -136,8 +146,8 @@ export class TinyMCEEditor implements CodeEditor.IEditor {
     revealPosition(position: CodeEditor.IPosition): void {}
     revealSelection(selection: CodeEditor.IRange): void {}
     setCursorPosition(position: CodeEditor.IPosition): void {}
-    setOption<K extends keyof CodeEditor.IConfig>(option: K, value: CodeEditor.IConfig[K]): void {}
-    setOptions(options: Partial<CodeEditor.IConfig>): void { this.defaultEditor.setOptions(options); }
+    setOption(option: string, value: any): void {}
+    setOptions(options: Partial<any>): void { this.defaultEditor.setOptions(options); }
     setSelection(selection: CodeEditor.IRange): void { this.defaultEditor.setSelection(selection); }
     setSelections(selections: CodeEditor.IRange[]): void { this.defaultEditor.setSelections(selections); }
     setSize(size: CodeEditor.IDimension | null): void { this.defaultEditor.setSize(size); }
@@ -163,8 +173,8 @@ class DummyDoc {
 }
 
 export namespace TinyMCEEditor {
-    export interface IOptions extends CodeEditor.IOptions { config?: Partial<IConfig>; }
-    export interface IConfig extends CodeEditor.IConfig {}
+    export interface IOptions extends CodeEditor.IOptions { config?: any; }
+    // export interface IConfig extends CodeEditor.IConfig {}
 }
 
 export class TinyMCEView {
@@ -194,9 +204,8 @@ export class TinyMCEView {
                     plugins: 'emoticons lists link code',
                     toolbar: 'styleselect fontsizeselect | bold italic underline strikethrough | subscript superscript | link forecolor backcolor emoticons | bullist numlist outdent indent blockquote | code',
                     init_instance_callback: (editor: any) => {
-                        // editor.on('change', () => model.value.text = editor.getContent());
                         editor.on('keyup', () => {
-                            model.value.text = editor.getContent();
+                            model.sharedModel.setSource(editor.getContent());
                         });
                     }
                 }).then(editor => {
@@ -209,7 +218,7 @@ export class TinyMCEView {
 
                     // Hide TinyMCE by default
                     setTimeout(() => {
-                        (host.querySelector('.tox-tinymce') as HTMLElement).style.display = 'none';
+                        (host.querySelector('.tox-tinymce') as HTMLElement).classList.add('jw-Hidden');
                     }, 200);
 
                     // Set the TinyMCE instance
@@ -228,7 +237,7 @@ export class TinyMCEView {
         // Special case to remove anchor links before loading
         const render_node = host?.parentElement?.querySelector('.jp-MarkdownOutput');
         if (render_node) render_node.querySelectorAll('.jp-InternalAnchorLink').forEach(e => e.remove());
-        return render_node?.innerHTML || model.value.text;
+        return render_node?.innerHTML || model.sharedModel.getSource();
     }
 
     blur() {}
@@ -236,11 +245,11 @@ export class TinyMCEView {
     focus() {}
 
     get_cell_index(model: CodeEditor.IModel) {
-        const id = model.modelDB.basePath;
+        const id = (model.sharedModel as any).getId();
         const all_cells = EditorWidget.instance().tracker.currentWidget.content.widgets;
         for (let i = 0; i < all_cells.length; i++) {
             const cell = all_cells[i];
-            const cell_id = cell.model.modelDB.basePath;
+            const cell_id = (cell.model.sharedModel as any).getId();
             if (id === cell_id) return i;
         }
         return null;

@@ -7,7 +7,7 @@ import { TinyMCEEditor } from "./editor";
 import { fileIcon, runIcon } from "@jupyterlab/ui-components";
 
 export class EditorContentFactory extends NotebookPanel.ContentFactory implements IEditorContentFactory {
-    constructor(options?: Cell.ContentFactory.IOptions | undefined) {
+    constructor(options?: Cell.ContentFactory.IOptions) {
         super(options);
     }
 
@@ -15,22 +15,31 @@ export class EditorContentFactory extends NotebookPanel.ContentFactory implement
      * Create a markdown cell with the WYSIWYG editor rather than CodeMirror
      *
      * @param options
-     * @param parent
      */
-    createMarkdownCell(options: MarkdownCell.IOptions, parent: StaticNotebook): MarkdownCell {
+    createMarkdownCell(options: MarkdownCell.IOptions): MarkdownCell {
         const model = options.model;
         const defaultEditorFactory = options.contentFactory.editorFactory;
         options.contentFactory = new EditorContentFactory({
             editorFactory: (options: CodeEditor.IOptions) => {
-                return new TinyMCEEditor(options, model, defaultEditorFactory(options as any));
+                const code_mirror_host = this._code_mirror_host(options.host);
+                return new TinyMCEEditor(options, model, defaultEditorFactory({host: code_mirror_host, ...options} as any));
             }
         } as any);
 
         return new MarkdownCell(options).initializeState();
-      }
+    }
+
+    _code_mirror_host(parent:HTMLElement): HTMLElement {
+        const code_mirror_host = document.createElement("div");
+        parent.appendChild(code_mirror_host);
+        return code_mirror_host;
+    }
 }
 
-export const IEditorContentFactory = new Token<IEditorContentFactory>("jupyter-wysiwyg");
+export const IEditorContentFactory = new Token<IEditorContentFactory>(
+    '@g2nb/jupyter-wysiwyg:IEditorContentFactory',
+    `A factory object that creates new notebooks with the rich text editor.`
+);
 
 export interface IEditorContentFactory extends NotebookPanel.IContentFactory {}
 
@@ -70,17 +79,19 @@ export class EditorWidget extends Widget {
     }
 
     render_side_button() {
-        const sidebar = this.sidebar(this._tracker.activeCell.node);
-        const run_button = this.run_button(this._tracker.activeCell, this._tracker.currentWidget);
-        const wysiwyg_button = this.wysiwyg_button(this._tracker.activeCell, this._tracker.currentWidget);
-        sidebar.append(run_button);
-        sidebar.append(wysiwyg_button);
+        if (this.no_side_button()) {
+            const sidebar = this.sidebar(this._tracker.activeCell.node);
+            const run_button = this.run_button(this._tracker.activeCell, this._tracker.currentWidget);
+            const wysiwyg_button = this.wysiwyg_button(this._tracker.activeCell, this._tracker.currentWidget);
+            sidebar.append(run_button);
+            sidebar.append(wysiwyg_button);
+        }
     }
 
     remove_side_button() {
         if (this._previous_cell) {
             const sidebar = this.sidebar(this._previous_cell.node);
-            sidebar.querySelectorAll(".jp-RenderButton").forEach(e => {
+            if (sidebar) sidebar.querySelectorAll(".jp-RenderButton").forEach(e => {
                 e.remove();
             });
         }
@@ -97,6 +108,7 @@ export class EditorWidget extends Widget {
         button.setAttribute("title", "Render this cell");
         button.innerHTML = runIcon.svgstr;
         button.addEventListener("click", () => {
+            (cell.editor as any).syncFromCodeMirror();
             panel.content.select(cell);
             setTimeout(() => void NotebookActions.runAndAdvance(panel.content, panel.sessionContext), 200);
         });
@@ -109,22 +121,19 @@ export class EditorWidget extends Widget {
         button.setAttribute("title", "Toggle the Rich Text Editor");
         button.innerHTML = fileIcon.svgstr;
         button.addEventListener("click", () => {
-            console.log('------------------------------------');
-            console.log(cell.editor);
             (cell.editor as any).syncFromCodeMirror();
-            console.log('------------------------------------');
 
             const tiny_mce = cell.node.querySelector('.tox-tinymce') as HTMLElement;
-            const code_mirror = cell.node.querySelector('.CodeMirror') as HTMLElement;
-            if (code_mirror.style.display === 'none') {
-                code_mirror.style.display = 'block';
-                tiny_mce.style.display = 'none';
-                cell.editor.refresh();
+            const code_mirror = cell.node.querySelector('.cm-editor') as HTMLElement;
+            if (code_mirror.classList.contains('jw-Hidden')) {
+                code_mirror.classList.remove('jw-Hidden')
+                tiny_mce.classList.add('jw-Hidden');
+                (cell.editor as any).refresh();
             }
             else {
-                code_mirror.style.display = 'none';
-                tiny_mce.style.display = 'flex';
-                cell.editor.refresh();
+                code_mirror.classList.add('jw-Hidden');
+                tiny_mce.classList.remove('jw-Hidden');
+                (cell.editor as any).refresh();
             }
         });
         return button;
