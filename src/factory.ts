@@ -94,6 +94,15 @@ export class EditorWidget extends Widget {
         button.addEventListener("click", () => {
             panel.content.select(cell);
             setTimeout(() => void NotebookActions.runAndAdvance(panel.content, panel.sessionContext), 200);
+
+            // Fix for bug where change() event in editor doesn't get triggered if the editing of the cell is toggled through the button
+            setTimeout(() => {
+                document.querySelector('.jp-Notebook-cell .jp-InputPrompt').dispatchEvent(new MouseEvent("focus", {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                }));
+            }, 1000);
         });
         return button;
     }
